@@ -1,0 +1,22 @@
+<mat-toolbar color="primary" class="mb-3">
+  <a class="text-reset text-decoration-none" [routerLink]="['/home']" >
+    <img src="../../../assets/images/favicon-96x96.png" style="height: 40px;" alt="escudo" />
+    <span>Gestion de Postulantes</span>
+  </a>
+  <div class="ms-3">
+    <button mat-button [routerLink]="['/listado/Cadetes']" [queryParams]="{ est: 0 }" routerLinkActive="active">Cadetes</button>
+    <button mat-button [routerLink]="['/listado/Suboficiales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Suboficiales</button>
+    <button mat-button [routerLink]="['/listado/Profesionales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Profesionales</button>
+  </div>
+
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="cambiarEstado(0)">Todos</button>
+    <button mat-menu-item (click)="cambiarEstado(1)">Pendientes</button>
+    <button mat-menu-item (click)="cambiarEstado(2)">En Proceso</button>
+    <button mat-menu-item (click)="cambiarEstado(3)">Aptos</button>
+    <button mat-menu-item (click)="cambiarEstado(4)">No Aptos</button>
+    <button mat-menu-item (click)="cambiarEstado(5)">En Reserva</button>
+  </mat-menu>
+</mat-toolbar>

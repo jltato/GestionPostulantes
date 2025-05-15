@@ -1,0 +1,33 @@
+
+<div>
+  <ng-container *ngIf="error; else datos">
+  <p class="error">{{ error }}</p>
+</ng-container>
+
+
+<ng-template #datos>
+  <div class="d-flex justify-content-between">
+    <pre>{{ postulante | json }}</pre>
+  <img [src]="imagenUrl" alt="Foto del postulante" style="max-height: 400px;"/>
+
+</div>
+
+
+</ng-template>
+
+  <div class="d-flex justify-content-between my-3">
+  <button class="btn btn-secondary" (click)="navegarAnterior()" [disabled]="currentIndex <= 0">
+    ← Anterior
+  </button>
+
+  <button class="btn btn-secondary" (click)="navegarSiguiente()" [disabled]="currentIndex >= postulanteIds.length - 1">
+    Siguiente →
+  </button>
+</div>
+<div class="text-center mb-2">
+  <span *ngIf="postulanteIds.length">
+    Registro {{ currentIndex + 1 }} de {{ postulanteIds.length }}
+  </span>
+</div>
+</div>
+
