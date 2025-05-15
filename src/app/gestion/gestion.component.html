@@ -1,33 +1,327 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 
 <div>
   <ng-container *ngIf="error; else datos">
-  <p class="error">{{ error }}</p>
-</ng-container>
+    <p class="error">{{ error }}</p>
+  </ng-container>
 
 
-<ng-template #datos>
-  <div class="d-flex justify-content-between">
-    <pre>{{ postulante | json }}</pre>
-  <img [src]="imagenUrl" alt="Foto del postulante" style="max-height: 400px;"/>
+  <ng-template #datos>
+    <div>
+    <div class="d-flex justify-content-between my-3">
+      <button class="btn btn-secondary" (click)="navegarAnterior()" [disabled]="currentIndex <= 0">
+        ← Anterior
+      </button>
+      <button class="btn btn-secondary" (click)="navegarSiguiente()" [disabled]="currentIndex >= postulanteIds.length - 1">
+        Siguiente →
+      </button>
+    </div>
+    <div class="text-center mb-2">
+      <span *ngIf="postulanteIds.length">
+        Registro {{ currentIndex + 1 }} de {{ postulanteIds.length }}
+      </span>
+    </div>
+  </div>
 
-</div>
+  <div class="row flex-xl-row-reverse ">
+    <div class="col-xl-4 d-flex flex-column align-items-center mb-2">
+      <div>
+        <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">FOTO CARNET</legend>
+        <img [src]="imagenUrl" alt="Foto del postulante" style="max-height: 400px; max-width: 400px;"/>
+        </fieldset>
+     </div>
+     <div >
+        <form [formGroup]="seguimientoFormGroup" class="formulario">
 
+            <input id="estado" class="form-select" formControlName="estadoSeguimientoId" hidden />
+        <fieldset class="border p-1 rounded my-3 row g-2">
+          <legend class="float-none w-auto px-3">SEGUIMIENTO</legend>
+            <div class="mb-3">
+              <label for="etapa" class="form-label">Etapa</label>
+              <select id="etapa" class="form-select" formControlName="etapaSeguimientoId">
+                <option *ngFor="let etapa of formData.etapaSeguimiento" [value]="etapa.etapaSeguimientoId">{{ etapa.nombreEtapa }}</option>
+              </select>
+            </div>
 
-</ng-template>
+            <div class="mb-3">
+              <label for="fecha" class="form-label">Fecha de Turno</label>
+              <input type="date" id="fecha" class="form-control" formControlName="fechaTurno">
+            </div>
 
-  <div class="d-flex justify-content-between my-3">
-  <button class="btn btn-secondary" (click)="navegarAnterior()" [disabled]="currentIndex <= 0">
-    ← Anterior
-  </button>
+            <div class="form-check mb-2">
+              <input type="checkbox" class="form-check-input" id="asistencia" formControlName="asistencia">
+              <label for="asistencia" class="form-check-label">Asistencia</label>
+            </div>
 
-  <button class="btn btn-secondary" (click)="navegarSiguiente()" [disabled]="currentIndex >= postulanteIds.length - 1">
-    Siguiente →
-  </button>
-</div>
-<div class="text-center mb-2">
-  <span *ngIf="postulanteIds.length">
-    Registro {{ currentIndex + 1 }} de {{ postulanteIds.length }}
-  </span>
-</div>
+            <div class="form-check mb-2">
+              <input type="checkbox" class="form-check-input" id="apto" formControlName="apto">
+              <label for="apto" class="form-check-label">Apto</label>
+            </div>
+
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="notificado" formControlName="notificado">
+              <label for="notificado" class="form-check-label">Notificado</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="seguimientoFormGroup.invalid">Guardar</button>
+        </fieldset>
+        </form >
+     </div>
+    </div>
+
+     <div class="col-xl-8 ">
+
+     <form [formGroup]="InicialFormGroup" class="formulario" >
+      <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">DATOS PERSONALES</legend>
+
+          <!-- Nombre -->
+          <div class="col-12 col-md-6 col-xl-4 form-floating">
+            <label class="form-label small">Nombre</label>
+            <input type="text" class="form-control form-control-sm" formControlName="nombre" appUppercase>
+          </div>
+
+          <!-- Apellido -->
+          <div class="col-12 col-md-4 col-xl-2 form-floating">
+            <label class="form-label small">Apellido</label>
+            <input type="text" class="form-control form-control-sm" formControlName="apellido" appUppercase>
+          </div>
+
+          <!-- DNI -->
+          <div class="col-12 col-md-2 col-xl-2 form-floating">
+            <label class="form-label small">DNI</label>
+            <input type="text" class="form-control form-control-sm" formControlName="dni" appUppercase>
+          </div>
+
+          <!-- e-mail -->
+          <div class="col-12 col-md-5 col-xl-4 form-floating">
+            <label class="form-label small">Mail</label>
+            <input type="email" class="form-control form-control-sm" formControlName="mail" appUppercase>
+          </div>
+
+          <!-- Fecha de nacimiento -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Fecha de Nacimiento</label>
+            <input type="date" class="form-control form-control-sm" formControlName="fechaNac" appUppercase>
+          </div>
+
+          <!-- Sexo -->
+          <div class="col-12 col-md-4 col-xl-2 form-floating">
+            <label class="form-label small">Sexo</label>
+            <select class="form-select form-select-sm" formControlName="sexoId">
+              <option *ngFor="let sexo of formData.sexos" [value]="sexo.sexoId">{{ sexo.sexoName }}</option>
+            </select>
+          </div>
+
+          <!-- Establecimiento de solicitud -->
+          <div class="col-12 col-md-4 col-xl-3 form-floating" *ngIf="tipoInscripcionId !== 1">
+            <label class="form-label small">Establecimiento de Solicitud</label>
+            <select class="form-select form-select-sm" formControlName="estabSolicitudId">
+              <option *ngFor="let est of formData.establecimientos" [value]="est.establecimientoId">{{ est.establecimientoCiudad }}</option>
+            </select>
+          </div>
+
+          <!-- Nacionalidad -->
+          <div class="col-12 col-md-4 col-xl-3 form-floating">
+            <label class="form-label small">Nacionalidad</label>
+            <select class="form-select form-select-sm" formControlName="nacionalidadId">
+              <option *ngFor="let nac of formData.nacionalidades" [value]="nac.nacionalidadId">{{ nac.nombreNacionalidad }}</option>
+            </select>
+          </div>
+
+          <!-- Género -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Género</label>
+            <select class="form-select form-select-sm" formControlName="generoId">
+              <option *ngFor="let genero of formData.generos" [value]="genero.generoId">{{ genero.generoNombre }}</option>
+            </select>
+          </div>
+
+          <!-- Estado Civil -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Estado Civil</label>
+            <select class="form-select form-select-sm" formControlName="estadoCivilId">
+              <option *ngFor="let estado of formData.estadosCiviles" [value]="estado.estadoCivilId">{{ estado.estadoCivilNombre }}</option>
+            </select>
+          </div>
+
+          <!-- Altura -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Altura (cm)</label>
+            <input type="number" class="form-control form-control-sm" formControlName="altura" >
+          </div>
+
+          <!-- Peso -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Peso (kg)</label>
+            <input type="number" class="form-control form-control-sm" formControlName="peso" >
+          </div>
+
+          <!-- Cantidad de tatuajes -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Tatuajes</label>
+            <input type="number" class="form-control form-control-sm" formControlName="cantidadTatuajes" >
+          </div>
+      </fieldset>
+      <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">DOMICILIO</legend>
+          <!-- Calle -->
+          <div class="col-12 col-md-5 col-xl-4 form-floating">
+            <label class="form-label small">Calle</label>
+            <input type="text" class="form-control form-control-sm" formControlName="calle" appUppercase>
+          </div>
+
+          <!-- Número -->
+          <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <label class="form-label small">Número</label>
+            <input type="text" class="form-control form-control-sm" formControlName="numero" appUppercase>
+          </div>
+
+          <!-- Localidad -->
+          <div class="col-12 col-md-5 col-xl-4 form-floating">
+            <label class="form-label small">Localidad</label>
+            <select class="form-select form-select-sm" formControlName="localidadId">
+              <option *ngFor="let loc of formData.localidades" [value]="loc.localidadId">{{ loc.localidadName }}</option>
+            </select>
+          </div>
+
+          <!-- Código postal -->
+          <div class="col-12 col-md-4 col-xl-2 form-floating">
+            <label class="form-label small">Código Postal</label>
+            <input type="text" class="form-control form-control-sm" formControlName="codigoPostal" appUppercase>
+          </div>
+         </fieldset>
+                   <!-- Contactos -->
+         <fieldset class="border p-1 rounded mb-3 row g-2 p-2">
+            <legend class="float-none w-auto px-3">CONTACTO</legend>
+            <table class="table table-bordered table-sm ">
+              <thead class="table-light">
+                <tr *ngIf="!postulante.contacto || postulante.contacto.length === 0">
+                  <td colspan="2" class="text-center">Sin contactos</td>
+                </tr>
+                <tr>
+                  <th>Teléfono:</th>
+                  <th>Pertenece a:</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let contacto of postulante.contactos">
+                  <td>{{ contacto.telefono }}</td>
+                  <td>{{ contacto.perteneciente }}</td>
+                </tr>
+              </tbody>
+            </table>
+        </fieldset>
+                           <!-- Estudios -->
+
+        <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">ESTUDIOS</legend>
+          <table class="table table-bordered table-sm">
+            <thead class="table-light">
+              <tr>
+                <th>Nivel</th>
+                <th>Título</th>
+                <th>Instituto</th>
+                <th>Año egreso</th>
+                <th>En curso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let estudio of postulante.estudios">
+                <td>{{ estudio.nivelEstudios.nivelNombre }}</td>
+                <td>{{ estudio.titulo }}</td>
+                <td>{{ estudio.institutoEducativo }}</td>
+                <td>{{ estudio.anoEgreso }}</td>
+                <td>{{ estudio.enCurso ? 'Sí' : 'No' }}</td>
+              </tr>
+              <tr *ngIf="!postulante.estudios || postulante.estudios.length === 0">
+                <td colspan="5" class="text-center">Sin estudios cargados</td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+                           <!-- trabajo -->
+
+        <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">TRABAJO</legend>
+        <table class="table table-bordered table-sm" *ngIf="postulante.trabajos && postulante.trabajos.length > 0">
+            <thead class="table-light">
+              <tr>
+                <th>Actividad</th>
+                <th>Desde</th>
+                <th>Hasta</th>
+                <th>Intento anterior</th>
+                <th>Otra fuerza</th>
+                <th>Motivo baja</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let trabajo of postulante.trabajos">
+                <td>{{ trabajo.actividadLaboral }}</td>
+                <td>{{ trabajo.desde | date:'yyyy-MM-dd' }}</td>
+                <td>{{ trabajo.hasta | date:'yyyy-MM-dd' }}</td>
+                <td>{{ trabajo.intentoAnterior ? 'Sí' : 'No' }}</td>
+                <td>{{ trabajo.otraFuerza ? 'Sí' : 'No' }}</td>
+                <td>{{ trabajo.motivoBaja || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="!postulante.trabajos || postulante.trabajos.length === 0" class="text-center">
+            Sin trabajos cargados
+          </div>
+        </fieldset>
+                           <!-- Familiares -->
+
+        <fieldset class="border p-1 rounded mb-3 row g-2">
+        <legend class="float-none w-auto px-3">FAMILIA</legend>
+          <table class="table table-bordered table-sm" *ngIf="postulante.familiares && postulante.familiares.length > 0">
+              <thead class="table-light">
+                <tr>
+                  <th>DNI</th>
+                  <th>Apellido</th>
+                  <th>Nombre</th>
+                  <th>Parentesco</th>
+                  <th>Convive</th>
+                  <th>Empleado</th>
+                  <th>Activo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let fam of postulante.familiares">
+                  <td>{{ fam.dni }}</td>
+                  <td>{{ fam.apellido }}</td>
+                  <td>{{ fam.nombre }}</td>
+                  <td>{{ fam.parentesco?.parentescoNombre }}</td>
+                  <td>{{ fam.convive ? 'Sí' : 'No' }}</td>
+                  <td>{{ fam.esEmpleado ? 'Sí' : 'No' }}</td>
+                  <td>{{ fam.activo ? 'Sí' : 'No' }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="!postulante.familiares || postulante.familiares.length === 0" class="text-center">
+              Sin familiares cargados
+            </div>
+
+        </fieldset>
+
+                    <!-- Observaciones -->
+        <fieldset class="border p-1 rounded mb-3 row g-2 mb-5">
+        <legend class="float-none w-auto px-3">OBSERVACIONES</legend>
+          <div class="col-12 form-floating">
+            <label class="form-label small ">Observaciones</label>
+            <textarea class="form-control form-control-sm" rows="3" formControlName="observaciones" appUppercase></textarea>
+          </div>
+        </fieldset>
+
+        </form>
+
+     </div>
+
+  </div>
+  </ng-template>
+
 </div>
 

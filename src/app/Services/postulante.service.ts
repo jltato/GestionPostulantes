@@ -49,4 +49,9 @@ export class PostulanteService {
   );
   }
 
+   getFormData(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/Postulantes/formdata`, { headers: this.getHeaders(true) });
+  }
+
+
 }

@@ -1,0 +1,40 @@
+/* Reduce tamaño de letra general del formulario */
+form.formulario,
+form.formulario mat-form-field,
+form.formulario input,
+form.formulario select,
+form.formulario textarea,
+form.formulario mat-label,
+legend{
+  font-size: 0.85rem;
+}
+
+/* Reduce padding y margen entre campos */
+form.formulario .mat-form-field {
+  margin-bottom: 8px;
+}
+
+/* Reduce altura de los inputs */
+form.formulario .mat-input-element {
+  padding: 0.25rem 0.5rem;
+  height: 1.8rem;
+}
+
+/* Reduce espacio del mat-label */
+form.formulario .mat-form-field-label {
+  top: 0.8em;
+}
+
+/* Compacta los checkbox */
+form.formulario mat-checkbox {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Reduce separación vertical en general */
+form.formulario .col-12,
+form.formulario .col-lg-6,
+form.formulario .col-xl-4 {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}

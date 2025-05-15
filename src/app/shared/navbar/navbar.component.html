@@ -1,16 +1,16 @@
-<mat-toolbar color="primary" class="mb-3">
+<mat-toolbar class="mb-3 bg-dark text-light">
   <a class="text-reset text-decoration-none" [routerLink]="['/home']" >
     <img src="../../../assets/images/favicon-96x96.png" style="height: 40px;" alt="escudo" />
     <span>Gestion de Postulantes</span>
   </a>
   <div class="ms-3">
-    <button mat-button [routerLink]="['/listado/Cadetes']" [queryParams]="{ est: 0 }" routerLinkActive="active">Cadetes</button>
-    <button mat-button [routerLink]="['/listado/Suboficiales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Suboficiales</button>
-    <button mat-button [routerLink]="['/listado/Profesionales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Profesionales</button>
+    <button class="text-light" mat-button [routerLink]="['/listado/Cadetes']" [queryParams]="{ est: 0 }" routerLinkActive="active">Cadetes</button>
+    <button class="text-light" mat-button [routerLink]="['/listado/Suboficiales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Suboficiales</button>
+    <button class="text-light" mat-button [routerLink]="['/listado/Profesionales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Profesionales</button>
   </div>
 
   <span class="spacer"></span>
-  <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+  <button mat-button class="text-light" [matMenuTriggerFor]="menu">Menu</button>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="cambiarEstado(0)">Todos</button>
     <button mat-menu-item (click)="cambiarEstado(1)">Pendientes</button>

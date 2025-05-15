@@ -58,7 +58,6 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.estadoId = nuevoEstadoId;
       this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
 
-
       this.rerender();
     });
 
@@ -183,6 +182,11 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
    rerender(): void {
+    if (!this.dtElement) {
+    console.warn('dtElement no está definido aún.');
+    return;
+    }
+
     this.dtElement.dtInstance.then(dtInstance => {
       // Destroy the table first
       dtInstance.destroy();
