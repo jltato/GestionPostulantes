@@ -5,20 +5,20 @@ export const routes: Routes = [
   {
     path: 'listado/:tipo',
     loadComponent: () =>
-      import('./list/list.component').then(m => m.ListComponent)
+      import('./list/list.component').then((m) => m.ListComponent),
   },
   {
     path: 'gestion/:id',
     loadComponent: () =>
-      import('./gestion/gestion.component').then(g => g.GestionComponent)
+      import('./gestion/gestion.component').then((g) => g.GestionComponent),
   },
   {
     path: '',
     redirectTo: 'home',
-    pathMatch: 'full' // Ruta por defecto
+    pathMatch: 'full', // Ruta por defecto
   },
   {
-    path:'home',
-    component: HomeComponent
-  }
+    path: 'home',
+    component: HomeComponent,
+  },
 ];

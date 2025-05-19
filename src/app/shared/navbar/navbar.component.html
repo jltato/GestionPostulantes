@@ -1,12 +1,40 @@
 <mat-toolbar class="mb-3 bg-dark text-light">
-  <a class="text-reset text-decoration-none" [routerLink]="['/home']" >
-    <img src="../../../assets/images/favicon-96x96.png" style="height: 40px;" alt="escudo" />
+  <a class="text-reset text-decoration-none" [routerLink]="['/home']">
+    <img
+      src="../../../assets/images/favicon-96x96.png"
+      style="height: 40px"
+      alt="escudo"
+    />
     <span>Gestion de Postulantes</span>
   </a>
   <div class="ms-3">
-    <button class="text-light" mat-button [routerLink]="['/listado/Cadetes']" [queryParams]="{ est: 0 }" routerLinkActive="active">Cadetes</button>
-    <button class="text-light" mat-button [routerLink]="['/listado/Suboficiales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Suboficiales</button>
-    <button class="text-light" mat-button [routerLink]="['/listado/Profesionales']" [queryParams]="{ est: 0 }" routerLinkActive="active">Profesionales</button>
+    <button
+      class="text-light"
+      mat-button
+      [routerLink]="['/listado/Cadetes']"
+      [queryParams]="{ est: 0 }"
+      routerLinkActive="active"
+    >
+      Cadetes
+    </button>
+    <button
+      class="text-light"
+      mat-button
+      [routerLink]="['/listado/Suboficiales']"
+      [queryParams]="{ est: 0 }"
+      routerLinkActive="active"
+    >
+      Suboficiales
+    </button>
+    <button
+      class="text-light"
+      mat-button
+      [routerLink]="['/listado/Profesionales']"
+      [queryParams]="{ est: 0 }"
+      routerLinkActive="active"
+    >
+      Profesionales
+    </button>
   </div>
 
   <span class="spacer"></span>

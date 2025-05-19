@@ -1,33 +1,33 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AfterViewInit, Component,  inject,  OnDestroy,  OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Config } from 'datatables.net';
-import { DataTablesModule, DataTableDirective } from "angular-datatables";
+import { DataTablesModule, DataTableDirective } from 'angular-datatables';
 import { environment } from '../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import 'datatables.net-buttons-dt';
-import 'datatables.net-responsive-dt'
+import 'datatables.net-responsive-dt';
 
 @Component({
   selector: 'app-list',
-  standalone:true,
-  imports: [
-    CommonModule ,
-    DataTablesModule
-  ],
+  standalone: true,
+  imports: [CommonModule, DataTablesModule],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css'
+  styleUrl: './list.component.css',
 })
-
 export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
-
-  @ViewChild(DataTableDirective, {static: false})
+  @ViewChild(DataTableDirective, { static: false })
   dtElement!: DataTableDirective;
 
   dtTrigger: Subject<any> = new Subject<any>();
-
 
   storageKey = 'DataTables_postulantes_listado';
 
@@ -39,48 +39,50 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
   dtOptions: Config = {};
 
   private baseUrl = environment.apiUrl;
-  private apiKey = 'gRnMxbEdZjkVr9m9jc18o4DcLu9CbD202KmzVp0m0LN-YPlZXUvXKgmp2GrJd9o6F1NfUFUKIyyGzh9LJ56G1LFZsJClNkbJjf-iCHhvLj1kO8oDaLKaS2pvtu1IcgsgFgqDuT4B0TieOpn8GEJuiUIM-VXUMvCR0JdsH9vWDr2KjewWqfCsQbnudLP2sUwz0vAWpLNaDPpFbXeq3V-xO7W1qlO9ETHtnoBBUHyrQQPIIiE4Ywc4oDsFkANjSxT9';
+  private apiKey =
+    'gRnMxbEdZjkVr9m9jc18o4DcLu9CbD202KmzVp0m0LN-YPlZXUvXKgmp2GrJd9o6F1NfUFUKIyyGzh9LJ56G1LFZsJClNkbJjf-iCHhvLj1kO8oDaLKaS2pvtu1IcgsgFgqDuT4B0TieOpn8GEJuiUIM-VXUMvCR0JdsH9vWDr2KjewWqfCsQbnudLP2sUwz0vAWpLNaDPpFbXeq3V-xO7W1qlO9ETHtnoBBUHyrQQPIIiE4Ywc4oDsFkANjSxT9';
   filteredIds: number[] = [];
 
   ngOnInit(): void {
-
     this.tipo = this.route.snapshot.paramMap.get('tipo')!;
-    this.estadoId = Number(this.route.snapshot.queryParamMap.get('est') ?? "1");
+    this.estadoId = Number(this.route.snapshot.queryParamMap.get('est') ?? '1');
     this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
 
-    combineLatest([
-      this.route.paramMap,
-      this.route.queryParamMap
-    ]).subscribe(([params, queryParams]) => {
-      const nuevoTipo = params.get('tipo')!;
-      const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
-      this.tipo = nuevoTipo;
-      this.estadoId = nuevoEstadoId;
-      this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
+      ([params, queryParams]) => {
+        const nuevoTipo = params.get('tipo')!;
+        const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
+        this.tipo = nuevoTipo;
+        this.estadoId = nuevoEstadoId;
+        this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
 
-      this.rerender();
-    });
+        this.rerender();
+      },
+    );
 
-     const windowHeight : number = $(window).height() ?? 600;
-      const tabla = $('#laTabla');
-      let tableOffsetTop = 0;
-      if (tabla.length > 0 && tabla.offset()) {
-        tableOffsetTop = tabla.offset()!.top;
-}
-      const  availableHeight = windowHeight - tableOffsetTop - 300;
+    const windowHeight: number = $(window).height() ?? 600;
+    const tabla = $('#laTabla');
+    let tableOffsetTop = 0;
+    if (tabla.length > 0 && tabla.offset()) {
+      tableOffsetTop = tabla.offset()!.top;
+    }
+    const availableHeight = windowHeight - tableOffsetTop - 300;
     this.dtOptions = {
       serverSide: true,
       stateSave: true,
       stateDuration: -1,
       order: [],
-      lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'Todos']],
+      lengthMenu: [
+        [10, 25, 50, 100, -1],
+        [10, 25, 50, 100, 'Todos'],
+      ],
       pageLength: 50,
-      scrollY: availableHeight + "px",
+      scrollY: availableHeight + 'px',
       responsive: true,
       deferRender: true,
       processing: true,
       language: {
-        url: 'assets/Language.Json'
+        url: 'assets/Language.Json',
       },
       ajax: {
         url: `${this.baseUrl}/Postulantes/postulantesList`,
@@ -101,7 +103,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar datos:', err);
           return [];
-        }
+        },
       },
       columns: [
         { title: 'ID', data: 'id' },
@@ -111,7 +113,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
           render: function (data) {
             const date = new Date(data);
             return date.toLocaleDateString('es-AR');
-          }
+          },
         },
         { title: 'Apellido', data: 'apellido' },
         { title: 'Nombres', data: 'nombre' },
@@ -119,40 +121,46 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'DNI', data: 'dni' },
         { title: 'Estab. Solicitado', data: 'estabSolicitud' },
         { title: 'Estado', data: 'estadoNombre' },
-        { title: 'Fecha',
+        {
+          title: 'Fecha',
           data: 'estadoFecha',
           render: function (data) {
             const date = new Date(data);
-            return date.toLocaleDateString('es-AR') + ' ' + date.toLocaleTimeString('es-AR', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            });
-          }
+            return (
+              date.toLocaleDateString('es-AR') +
+              ' ' +
+              date.toLocaleTimeString('es-AR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              })
+            );
+          },
         },
       ],
-      dom: "<'row mb-2'<'col-sm-6 text-start'l><'col-sm-6 text-end'f>>" +
-     "<'row'<'col-sm-12'tr>>" +
-     "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
-     "<'row mt-2' <'dt-buttons text-end'B>>",
+      dom:
+        "<'row mb-2'<'col-sm-6 text-start'l><'col-sm-6 text-end'f>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+        "<'row mt-2' <'dt-buttons text-end'B>>",
       buttons: [
         {
           extend: 'print',
-          title: "Postulantes",
-          message: "Listado de postulantes",
+          title: 'Postulantes',
+          message: 'Listado de postulantes',
           messageTop: 'Postulantes',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-          }
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          },
         },
         {
           extend: 'excel',
-          title: "Listado de postulantes",
-          messageTop: "Listado de postulantes",
+          title: 'Listado de postulantes',
+          messageTop: 'Listado de postulantes',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-          }
-        }
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          },
+        },
       ],
       rowCallback: (row: Node, data: any[] | any) => {
         $('td', row).off('click');
@@ -163,57 +171,59 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return row;
       },
       stateSaveCallback: (settings, data) => {
-    localStorage.setItem(this.storageKey, JSON.stringify(data));
-  },
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+      },
 
-  stateLoadCallback: () => {
-    const data = localStorage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : null;
-  },
+      stateLoadCallback: () => {
+        const data = localStorage.getItem(this.storageKey);
+        return data ? JSON.parse(data) : null;
+      },
     };
   }
 
   ngAfterViewInit(): void {
-     this.dtTrigger.next(null);
+    this.dtTrigger.next(null);
   }
 
-   ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
 
-   rerender(): void {
+  rerender(): void {
     if (!this.dtElement) {
-    console.warn('dtElement no está definido aún.');
-    return;
+      console.warn('dtElement no está definido aún.');
+      return;
     }
 
-    this.dtElement.dtInstance.then(dtInstance => {
+    this.dtElement.dtInstance.then((dtInstance) => {
       // Destroy the table first
       dtInstance.destroy();
       // Call the dtTrigger to rerender again
       this.dtTrigger.next(null);
-       this.resetearEstadoDataTable();
+      this.resetearEstadoDataTable();
     });
   }
 
-
   resetearEstadoDataTable() {
-  this.storageKey = `DataTables_${this.router.url}`;
-  localStorage.removeItem(this.storageKey);
+    this.storageKey = `DataTables_${this.router.url}`;
+    localStorage.removeItem(this.storageKey);
   }
 
   ClickHandler(id: number) {
-  sessionStorage.setItem('postulanteIds', JSON.stringify(this.filteredIds));
-  this.router.navigate(['gestion', id]);
+    sessionStorage.setItem('postulanteIds', JSON.stringify(this.filteredIds));
+    this.router.navigate(['gestion', id]);
   }
 
-tipoANumero(tipo: string): number {
- switch(tipo){
-  case"cadetes" : return 1;
-  case "suboficiales" : return 2;
-  case "profesionales" : return 3;
-  default : return 1;
- }
-}
-
+  tipoANumero(tipo: string): number {
+    switch (tipo) {
+      case 'cadetes':
+        return 1;
+      case 'suboficiales':
+        return 2;
+      case 'profesionales':
+        return 3;
+      default:
+        return 1;
+    }
+  }
 }

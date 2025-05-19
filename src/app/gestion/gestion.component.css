@@ -5,7 +5,7 @@ form.formulario input,
 form.formulario select,
 form.formulario textarea,
 form.formulario mat-label,
-legend{
+legend {
   font-size: 0.85rem;
 }
 
@@ -37,4 +37,13 @@ form.formulario .col-lg-6,
 form.formulario .col-xl-4 {
   padding-top: 4px;
   padding-bottom: 4px;
+}
+
+.altura-dinamica {
+  height: 30vh;
+  min-height: 200px;
+}
+.altura-dinamica img {
+  height: 25vh;
+  min-height: 150px;
 }
