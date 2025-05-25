@@ -79,4 +79,13 @@ export class PostulanteService {
       headers: this.getHeaders(false),
     });
   }
+
+  getExcel(ListId: number[]): Observable<any> {
+     return this.http.post( `${this.baseUrl}/Postulantes/Excel`,
+      ListId,
+      {
+      headers: this.getHeaders(false),
+       responseType: 'blob',
+       })
+  }
 }

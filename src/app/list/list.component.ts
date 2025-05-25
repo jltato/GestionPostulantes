@@ -15,6 +15,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import 'datatables.net-buttons-dt';
 import 'datatables.net-responsive-dt';
+import { PostulanteService } from '../Services/postulante.service';
 
 @Component({
   selector: 'app-list',
@@ -37,6 +38,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
   estadoId!: number;
   private tipoPostulanteId = 1;
   dtOptions: Config = {};
+  private postulanteService = inject(PostulanteService)
 
   private baseUrl = environment.apiUrl;
   private apiKey =
@@ -161,6 +163,14 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
             columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
           },
         },
+        {
+          text: 'Excel Extendido',
+          key: '1',
+          action: (e, dt, node) => {
+            const originalText = node.html();
+            this.excelDownload(node, originalText);
+          }
+        }
       ],
       rowCallback: (row: Node, data: any[] | any) => {
         $('td', row).off('click');
@@ -226,4 +236,37 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return 1;
     }
   }
+
+  excelDownload(node: any, originalText: string) {
+    node.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...'); // ícono de carga
+    node.prop('disabled', true); // deshabilitar botón
+
+    this.postulanteService.getExcel(this.filteredIds)
+      .subscribe({
+        next:(blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'postulantes.xlsx';
+        a.type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        },
+        error: (err) =>{
+          console.error(err);
+          alert('Ocurrió un error al generar el Excel. Intente nuevamente.');
+          node.html(originalText);
+          node.prop('disabled', false);
+        },
+        complete:()=>{
+          node.html(originalText);
+          node.prop('disabled', false);
+        }
+      });
+  }
+
 }
+
+
+
+
