@@ -47,3 +47,8 @@ form.formulario .col-xl-4 {
   height: 25vh;
   min-height: 150px;
 }
+
+.force-bg-danger {
+  background-color: #dc3545 !important;
+  color: white;
+}

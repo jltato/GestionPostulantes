@@ -42,18 +42,28 @@ export class PostulanteService {
       );
   }
 
+   getVerificacion(id:string): Observable<any> {
+    return this.http
+      .get<any>(`${this.baseUrl}/Postulantes/Verificar/${id}`,
+        {
+          headers:this.getHeaders(true),
+        })
+   }
+
+   getFamiliares(id:string): Observable<any> {
+    return this.http
+      .get<any>(`${this.baseUrl}/Postulantes/Familiares/${id}`,
+        {
+          headers:this.getHeaders(true),
+        })
+   }
+
   getImage(id: string): Observable<Blob> {
     return this.http
       .get<Blob>(`${this.baseUrl}/Documentos/${id}`, {
         headers: this.getHeaders(false),
         responseType: 'blob' as 'json',
       })
-      // .pipe(
-      //   catchError((error) => {
-      //     console.error('Error al obtener imagen', error);
-      //     return throwError(() => new Error('No se pudo cargar la imagen.'));
-      //   }),
-      // );
   }
 
   getFormData(): Observable<any> {
@@ -88,4 +98,7 @@ export class PostulanteService {
        responseType: 'blob',
        })
   }
+
+
+
 }

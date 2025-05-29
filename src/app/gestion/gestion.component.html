@@ -74,7 +74,13 @@
         >
           <fieldset class="border p-1 rounded mb-3 row g-2 mt-0">
             <legend class="float-none w-auto px-3">DATOS PERSONALES</legend>
-
+            <!-- Alertas -->
+            <div class="text-danger">
+              <p *ngIf="antecedentes"> *El DNI del postulante se encuentra en la base de datos de internos.</p>
+              <p *ngIf="visitante"> *El DNI del postulante se encuentra en la base de datos de visitantes.</p>
+              <p *ngIf="famAntecedente"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de internos.</p>
+              <p *ngIf="famVisitante"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de visitantes.</p>
+            </div>
               <!-- Apellido -->
             <div class="col-12 col-md-4 col-xl-2 form-floating">
               <label class="form-label small">Apellido</label>
@@ -398,8 +404,8 @@
           <fieldset class="border p-1 rounded mb-3 row g-2">
             <legend class="float-none w-auto px-3">FAMILIA</legend>
             <table
-              class="table table-bordered table-sm"
-              *ngIf="postulante.familiares && postulante.familiares.length > 0"
+              class="table-bordered table-sm "
+              *ngIf="Familiares && Familiares.length > 0"
             >
               <thead class="table-light">
                 <tr>
@@ -410,24 +416,31 @@
                   <th>Convive</th>
                   <th>Empleado</th>
                   <th>Activo</th>
+                  <th>Antec.</th>
+                  <th>Visita</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let fam of postulante.familiares">
+                <tr *ngFor="let fam of Familiares" [ngClass]="{
+                  'bg-secondary': fam.esEmpleado,
+                  'force-bg-danger': fam.exInterno || fam.visita
+                }">
                   <td>{{ fam.dni }}</td>
                   <td>{{ fam.apellido }}</td>
                   <td>{{ fam.nombre }}</td>
-                  <td>{{ fam.parentesco?.parentescoNombre }}</td>
+                  <td>{{ fam.parentesco }}</td>
                   <td>{{ fam.convive ? "Sí" : "No" }}</td>
                   <td>{{ fam.esEmpleado ? "Sí" : "No" }}</td>
                   <td>{{ fam.activo ? "Sí" : "No" }}</td>
+                  <td>{{ fam.exInterno ? "Sí" : "No" }}</td>
+                  <td>{{ fam.visita ? "Sí" : "No" }}</td>
                 </tr>
               </tbody>
             </table>
 
             <div
               *ngIf="
-                !postulante.familiares || postulante.familiares.length === 0
+                !Familiares || Familiares.length === 0
               "
               class="text-center"
             >
@@ -491,9 +504,9 @@
                       </td>
                       <td>{{ estado.fechaTurno | date: "dd-MM-yy" }}</td>
                       <td>{{ estado.fechaTurno | date: "HH:mm" }}</td>
-                      <td>{{ estado.asistencia ? "X" : "" }}</td>
-                      <td>{{ estado.apto ? "X" : "" }}</td>
-                      <td>{{ estado.notificado ? "X" : "" }}</td>
+                      <td>{{ estado.asistencia ? "SI" : "" }}</td>
+                      <td>{{ estado.apto === true ? 'SI' : estado.apto === false ? 'NO' : '' }}</td>
+                      <td>{{ estado.notificado ? "SI" : "" }}</td>
                       <td>
                         <button
                           type="button"
@@ -507,76 +520,101 @@
                             style="font-size: 14px; color: red"
                           ></mat-icon>
                         </button>
+                        <span *ngIf="estado.estadoSeguimientoId === etapaActualId"> Actual </span>
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
+              <fieldset class="border g-2 mb-3 p-1 rounded row bg-light">
+                  <legend class="float-none w-auto px-3">Etapa Actual</legend>
+                      <div class="d-flex flex-wrap justify-content-around g-2">
+                        <div class="">
+                          <label for="etapa" class="form-label">Modificar</label>
+                          <select
+                            id="etapa"
+                            class="form-select"
+                            formControlName="etapaSeguimientoId"
+                            (change)="onEtapaChange()"
+                          >
+                            >
+                            <option
+                              *ngFor="let etapa of formData.etapaSeguimiento"
+                              [value]="etapa.etapaSeguimientoId"
+                            >
+                              {{ etapa.nombreEtapa }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="">
+                          <label for="fecha" class="form-label">Fecha</label>
+                          <input
+                            type="datetime-local"
+                            id="fecha"
+                            class="form-control"
+                            formControlName="fechaTurno"
+                          />
+                        </div>
+                        <div class="align-items-center d-flex flex-column gap-3 my-2 my-xl-0">
 
-              <div class="d-flex flex-wrap justify-content-around g-2">
-                <div class="">
-                  <label for="etapa" class="form-label">Etapa Actual</label>
-                  <select
-                    id="etapa"
-                    class="form-select"
-                    formControlName="etapaSeguimientoId"
-                    (change)="onEtapaChange()"
-                  >
-                    >
-                    <option
-                      *ngFor="let etapa of formData.etapaSeguimiento"
-                      [value]="etapa.etapaSeguimientoId"
-                    >
-                      {{ etapa.nombreEtapa }}
-                    </option>
-                  </select>
-                </div>
-                <div class="">
-                  <label for="fecha" class="form-label">Fecha</label>
-                  <input
-                    type="datetime-local"
-                    id="fecha"
-                    class="form-control"
-                    formControlName="fechaTurno"
-                  />
-                </div>
-
-                <div class="">
+                            <label for="asistencia" class="form-check-label"
+                              >Asistió</label
+                            >
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              id="asistencia"
+                              formControlName="asistencia"
+                            />
+                        </div>
+                      </div>
+                <div class="d-flex flex-wrap justify-content-around g-2">
                   <div class="form-check mb-2">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      id="asistencia"
-                      formControlName="asistencia"
-                    />
-                    <label for="asistencia" class="form-check-label"
-                      >Asistencia</label
-                    >
-                  </div>
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="sinDefinir"
+                        formControlName="apto"
+                        [value]="null"
+                      />
+                      <label for="sinDefinir" class="form-check-label">Sin definir</label>
+                    </div>
 
-                  <div class="form-check mb-2">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      id="apto"
-                      formControlName="apto"
-                    />
-                    <label for="apto" class="form-check-label">Apto</label>
-                  </div>
+                    <div class="form-check mb-2">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="apto"
+                        formControlName="apto"
+                        [value]="true"
+                      />
+                      <label for="apto" class="form-check-label">Apto</label>
+                    </div>
 
-                  <div class="form-check mb-3">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      id="notificado"
-                      formControlName="notificado"
-                    />
-                    <label for="notificado" class="form-check-label"
-                      >Notificado</label
-                    >
-                  </div>
-                </div>
+                    <div class="form-check mb-2">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="noApto"
+                        formControlName="apto"
+                        [value]="false"
+                      />
+                      <label for="noApto" class="form-check-label">No Apto</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input
+                          type="checkbox"
+                          class="form-check-input"
+                          id="notificado"
+                          formControlName="notificado"
+                        />
+                        <label for="notificado" class="form-check-label"
+                          >Notificado</label
+                        >
+                    </div>
               </div>
+              </fieldset>
+
             </div>
 
             <!-- div para barra divisora vertical -->
@@ -617,6 +655,7 @@
                   </select>
                 </div>
               </div>
+              <hr>
               <div class="mb-3">
                 <label for="observaciones" class="form-label"
                   >Observaciones:</label

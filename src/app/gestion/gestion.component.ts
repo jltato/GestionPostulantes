@@ -60,6 +60,12 @@ export class GestionComponent implements OnInit {
   guardando = false;
   fotoLista = true;
   etapaActualId = 0;
+  Familiares:any;
+  antecedentes = false;
+  visitante = false;
+  famAntecedente = false
+  famVisitante = false;
+
 
   //////////////////////////////////////// FORMULARIOS //////////////////////////////////////////////////////////////////////////////////////
 
@@ -100,7 +106,7 @@ export class GestionComponent implements OnInit {
     estadoGral: [2],
     fechaTurno: ['', Validators.required],
     asistencia: false,
-    apto: false,
+    apto: [false],
     notificado: false,
     observacion: [''],
     estadoId: [],
@@ -135,13 +141,31 @@ export class GestionComponent implements OnInit {
     this.fotoLista = false;
     this.postulanteService.getPostulante(id.toString()).subscribe({
       next: (postulante) => {
+        this.InicialFormGroup.disable();
         this.postulante = postulante;
-        //const tipoinscripcion = postulante.seguimiento.tipoInscripcion.tipoInscripcionNombre
-        //this.tipoInscripcionId = this.tipoInscripcion(tipoinscripcion)
-        const documentos = postulante.documentos;
         this.cargarDatos(postulante);
         this.getEdad(postulante.fechaNac);
-        this.InicialFormGroup.disable();
+        this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
+          next: (verificado)=>{
+            this.antecedentes = verificado[0].exInterno;
+            this.visitante = verificado[0].visitante;
+            console.log(verificado);
+          }
+        });
+        this.postulanteService.getFamiliares(postulante.postulanteId).subscribe({
+           next: (Familiares)=>{
+            console.log(Familiares);
+            this.Familiares = Familiares;
+            this.famVisitante = false;
+            this.famAntecedente = false;
+            Familiares.forEach((fam: { visita: any; exInterno: any; }) => {
+              if(fam.visita){this.famVisitante=true}
+              if(fam.exInterno){this.famAntecedente = true}
+            });
+          }
+        });
+
+        const documentos = postulante.documentos;
         if (documentos && documentos.length > 0) {
 
           const idFoto = documentos[0].documentoId;
@@ -164,6 +188,7 @@ export class GestionComponent implements OnInit {
               this.imagenUrl = 'assets/images/sin foto.png';
               this.fotoLista = true;
         }
+
       },
       error: (err) => {
         this.error = err.message;
@@ -356,7 +381,7 @@ export class GestionComponent implements OnInit {
   onEtapaChange() {
     this.seguimientoFormGroup.get('fechaTurno')?.setValue('');
     this.seguimientoFormGroup.get('asistencia')?.setValue(false);
-    this.seguimientoFormGroup.get('apto')?.setValue(false);
+    this.seguimientoFormGroup.get('apto')?.setValue(null);
     this.seguimientoFormGroup.get('notificado')?.setValue(false);
   }
 

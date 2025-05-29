@@ -207,9 +207,11 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dtElement.dtInstance.then((dtInstance) => {
       // Destroy the table first
-      dtInstance.destroy();
+      //dtInstance.destroy();
       // Call the dtTrigger to rerender again
-      this.dtTrigger.next(null);
+      //this.dtTrigger.next(null);
+       dtInstance.clear();
+       dtInstance.draw(false);
       this.resetearEstadoDataTable();
     });
   }
