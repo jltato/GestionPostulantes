@@ -18,9 +18,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatIcon } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
 import { UppercaseDirective } from '../directivas/uppercase.directive';
+import { SeguimientoComponent } from "../seguimiento/seguimiento.component";
+
 @Component({
   selector: 'app-gestion',
   imports: [
@@ -32,21 +33,20 @@ import { UppercaseDirective } from '../directivas/uppercase.directive';
     MatProgressSpinnerModule,
     MatInputModule,
     MatButtonModule,
-    MatIcon,
     MatNativeDateModule,
     MatDatepickerModule,
-    //MatOption,
     UppercaseDirective,
-  ],
+    SeguimientoComponent
+],
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.css',
 })
+
 export class GestionComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   postulante: any;
   imagenUrl: any;
-  error = '';
   private postulanteService = inject(PostulanteService);
   postulanteIds: number[] = [];
   currentIndex = 0;
@@ -55,16 +55,17 @@ export class GestionComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   public edadMaxima = 24;
   maxFechaNacimiento: Date = new Date();
-  seguimientoId = 0;
   edad = 0;
-  guardando = false;
   fotoLista = true;
-  etapaActualId = 0;
   Familiares:any;
   antecedentes = false;
   visitante = false;
   famAntecedente = false
   famVisitante = false;
+  error = '';
+  habilitado=false;
+  guardando = false;
+  postulanteId=0;
 
 
   //////////////////////////////////////// FORMULARIOS //////////////////////////////////////////////////////////////////////////////////////
@@ -99,27 +100,12 @@ export class GestionComponent implements OnInit {
     observaciones: [''],
   });
 
-  seguimientoFormGroup = this._formBuilder.group({
-    SeguimientoId: [''],
-    //estadoSeguimientoActualId:[''],
-    etapaSeguimientoId: [''],
-    estadoGral: [2],
-    fechaTurno: ['', Validators.required],
-    asistencia: false,
-    apto: [false],
-    notificado: false,
-    observacion: [''],
-    estadoId: [],
-    tipoInscripcionId: [''],
-  });
-
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ngOnInit(): void {
     this.postulanteService.getFormData().subscribe((data: any) => {
       this.formData = data;
 
-      // Esperamos a tener el formData antes de buscar el postulante
       this.route.paramMap.subscribe((params) => {
         const id = Number(params.get('id'));
         if (id && id !== this.idActual) {
@@ -143,6 +129,7 @@ export class GestionComponent implements OnInit {
       next: (postulante) => {
         this.InicialFormGroup.disable();
         this.postulante = postulante;
+        this.postulanteId = postulante.postulanteId;
         this.cargarDatos(postulante);
         this.getEdad(postulante.fechaNac);
         this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
@@ -218,7 +205,6 @@ export class GestionComponent implements OnInit {
       const mes = hoy.getMonth() - fecha.getMonth();
       const dia = hoy.getDate() - fecha.getDate();
       const edadExacta = mes < 0 || (mes === 0 && dia < 0) ? edad - 1 : edad;
-
       return edadExacta > this.edadMaxima ? { edadMaxima: true } : null;
     };
   }
@@ -227,9 +213,7 @@ export class GestionComponent implements OnInit {
     return (control: AbstractControl): ValidationErrors | null => {
       const fecha = new Date(control.value);
       const hoy = new Date();
-
       const fechaCalculo = new Date(hoy.getFullYear() + 1, 3, 1);
-
       const edad = fechaCalculo.getFullYear() - fecha.getFullYear();
       const mes = fechaCalculo.getMonth() - fecha.getMonth();
       const dia = fechaCalculo.getDate() - fecha.getDate();
@@ -256,8 +240,6 @@ export class GestionComponent implements OnInit {
   }
 
   cargarDatos(postulante: any): void {
-    this.etapaActualId = postulante.seguimiento.estadoSeguimientoActualId;
-    this.seguimientoId = postulante.seguimiento.seguimientoId;
     this.InicialFormGroup.patchValue({
       nombre: postulante.nombre,
       apellido: postulante.apellido,
@@ -277,19 +259,6 @@ export class GestionComponent implements OnInit {
       localidadId: postulante.domicilios[0].localidadId,
       codigoPostal: postulante.domicilios[0].codigoPostal,
       observaciones: postulante.datosPersonales.observaciones,
-    });
-    const fechaHoreaFormat = postulante.seguimiento.estadoSeguimientoActual.fechaTurno.substring(0, 16);
-    this.seguimientoFormGroup.patchValue({
-      etapaSeguimientoId:
-      postulante.seguimiento.estadoSeguimientoActual.etapaSeguimientoId,
-      fechaTurno: fechaHoreaFormat,
-      asistencia: postulante.seguimiento.estadoSeguimientoActual.asistencia,
-      apto: postulante.seguimiento.estadoSeguimientoActual.apto,
-      notificado: postulante.seguimiento.estadoSeguimientoActual.notificado,
-      SeguimientoId: postulante.seguimiento.seguimientoId,
-      observacion: postulante.seguimiento.observaciones,
-      estadoId: postulante.seguimiento.estadoId,
-      tipoInscripcionId: postulante.seguimiento.tipoInscripcionId,
     });
   }
 
@@ -325,109 +294,76 @@ export class GestionComponent implements OnInit {
     const hoy = new Date();
     let edad = hoy.getFullYear() - fecha.getFullYear();
     const m = hoy.getMonth() - fecha.getMonth();
-
     if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
       edad--;
     }
-
     this.edad = edad;
   }
 
-  enviarSeguimiento() {
-    this.guardando = false;
-    const seguimientoPayload = {
-      seguimientoId: this.seguimientoId,
-      observaciones: this.seguimientoFormGroup.value.observacion,
-      tipoInscripcionId: this.seguimientoFormGroup.value.tipoInscripcionId,
-      estadoId: this.seguimientoFormGroup.value.estadoId,
-      estadoSeguimientoActual: {
-        etapaSeguimientoId: this.seguimientoFormGroup.value.etapaSeguimientoId,
-        fechaTurno: this.seguimientoFormGroup.value.fechaTurno,
-        asistencia: this.seguimientoFormGroup.value.asistencia,
-        apto: this.seguimientoFormGroup.value.apto,
-        notificado: this.seguimientoFormGroup.value.notificado,
-      },
-    };
+  habilitar(){
+     this.InicialFormGroup.enable();
+     this.habilitado=true;
+  }
 
-    this.postulanteService.postSeguimiento(seguimientoPayload).subscribe({
-      next: (seguimiento) => {
-        this.etapaActualId = seguimiento.estadoSeguimientoActualId;
-        this.postulante.seguimiento.estadosSeguimiento =
-          seguimiento.estadosSeguimiento;
-        this.seguimientoId = seguimiento.seguimientoId;
-        const fechaHoreaFormat = seguimiento.estadoSeguimientoActual.fechaTurno.substring(0, 16);
-        this.seguimientoFormGroup.patchValue({
-          etapaSeguimientoId:
-            seguimiento.estadoSeguimientoActual.etapaSeguimientoId,
-            fechaTurno: fechaHoreaFormat,
-            asistencia: seguimiento.estadoSeguimientoActual.asistencia,
-            apto: seguimiento.estadoSeguimientoActual.apto,
-            notificado: seguimiento.estadoSeguimientoActual.notificado,
-            SeguimientoId: seguimiento.seguimientoId,
-            observacion: seguimiento.observaciones,
-            estadoId: seguimiento.estadoId,
-            tipoInscripcionId: seguimiento.tipoInscripcionId,
-        });
-        this.guardando = true;
+  deshabilitar(){
+    this.InicialFormGroup.disable();
+    this.habilitado=false;
+  }
+  guardar(){
+    this.guardando=true;
+
+    const form = this.InicialFormGroup.value;
+
+    const postulante = {
+      postulanteId: this.postulanteId,
+      nombre: form.nombre,
+      apellido: form.apellido,
+      mail: form.mail,
+      fechaNac: form.fechaNac,
+      sexoId: form.sexoId,
+      estabSolicitudId: form.estabSolicitudId,
+      dni: form.dni,
+      nacionalidadId: form.nacionalidadId,
+      nacionalizado: form.nacionalizado,
+      datosPersonales: {
+        generoId: form.generoId,
+        estadoCivilId: form.estadoCivilId,
+        altura: form.altura,
+        peso: form.peso,
+        tieneTatuajes: form.tieneTatuajes,
+        cantidadTatuajes: form.cantidadTatuajes,
+        observaciones: form.observaciones
+      },
+      domicilios: [
+        {
+          domicilioId: this.postulante.domicilios[0].domicilioId, // ID original
+          calle: form.calle,
+          numero: form.numero,
+          localidadId: form.localidadId,
+          codigoPostal: form.codigoPostal
+        }
+      ]
+    }
+
+
+    this.postulanteService.putPostulante(this.postulanteId, postulante).subscribe({
+      next: (res) => {
+        console.log('Postulante actualizado con éxito', res);
+        this.guardando = false;
+        this.habilitado=false;
+        const dateString = this.InicialFormGroup.value.fechaNac ?? "";
+        this.getEdad(new Date(dateString));
+        this.InicialFormGroup.disable();
+
+
       },
       error: (err) => {
-        this.error = err.message;
-        this.guardando = true;
-        console.log(err);
-      },
-    });
+        alert("ha ocurrido un error al guardar los datos, por favor intente nuevamente")
+        console.error('Error al actualizar', err);
+        this.guardando=false
+      }
+    })
+
   }
 
-  onEtapaChange() {
-    this.seguimientoFormGroup.get('fechaTurno')?.setValue('');
-    this.seguimientoFormGroup.get('asistencia')?.setValue(false);
-    this.seguimientoFormGroup.get('apto')?.setValue(null);
-    this.seguimientoFormGroup.get('notificado')?.setValue(false);
-  }
-
-  eliminarEstado(estadoId: number) {
-    if (confirm('¿Estás seguro que querés eliminar este estado?')) {
-      this.guardando = false;
-      this.postulanteService.eliminarEstado(estadoId).subscribe({
-        next: (seguimiento) => {
-          this.postulante.seguimiento.estadosSeguimiento =
-            seguimiento.estadosSeguimiento;
-          this.seguimientoId = seguimiento.seguimientoId;
-          const fechaHoreaFormat = seguimiento.estadoSeguimientoActual.fechaTurno.substring(0, 16);
-          this.etapaActualId = seguimiento.estadoSeguimientoActualId;
-          this.seguimientoFormGroup.patchValue({
-            etapaSeguimientoId:
-            seguimiento.estadoSeguimientoActual.etapaSeguimientoId,
-            fechaTurno: fechaHoreaFormat,
-            asistencia: seguimiento.estadoSeguimientoActual.asistencia,
-            apto: seguimiento.estadoSeguimientoActual.apto,
-            notificado: seguimiento.estadoSeguimientoActual.notificado,
-            SeguimientoId: seguimiento.seguimientoId,
-            observacion: seguimiento.observaciones,
-            estadoId: seguimiento.estadoId,
-            tipoInscripcionId: seguimiento.tipoInscripcionId,
-          });
-          this.guardando = true;
-        },
-        error: (err) => {
-          this.error = err.error;
-          console.log(err);
-          this.guardando = true;
-        },
-      });
-    }
-  }
-
-  BorrarPostulante(postulanteId: number) {
-    if (confirm('¿Estás seguro que querés eliminar este Postualante?')) {
-      this.postulanteService.eliminarPostulante(postulanteId).subscribe({
-        next: () => {
-          this.router.navigate(['/home']);
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      });
-    }
-  }
 }

@@ -99,6 +99,8 @@ export class PostulanteService {
        })
   }
 
-
+  putPostulante(postulanteId: number, postulante: any): Observable<any>{
+    return this.http.put(`${this.baseUrl}/Postulantes/${postulanteId}`, postulante, {headers:this.getHeaders(false)})
+  }
 
 }

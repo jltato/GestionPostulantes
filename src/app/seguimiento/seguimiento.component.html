@@ -1,0 +1,226 @@
+<form
+      *ngIf="etapaActualId !== 0 && seguimiento"
+      [formGroup]="seguimientoFormGroup"
+      class="formulario"
+      (ngSubmit)="enviarSeguimiento()"
+      >
+        <fieldset class="border g-2 mb-3 p-1 rounded row">
+          <legend class="float-none w-auto px-3">SEGUIMIENTO</legend>
+          <div class="d-flex flex-wrap justify-content-around g-2">
+            <!-- div para el seguimiento del postulante -->
+            <div class="col-12 col-xl-6 ">
+              <div class="">
+                Etapas
+                <table class="table table-bordered text-center table-sm">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Etapa</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Asist.</th>
+                      <th>Apto</th>
+                      <th>Notif.</th>
+                      <th>Borrar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let estado of seguimiento.estadosSeguimiento
+                      "
+                      class="align-middle"
+                    >
+                      <td class="text-nowrap">
+                        {{ estado.etapaSeguimiento.nombreEtapa }}
+                      </td>
+                      <td>{{ estado.fechaTurno | date: "dd-MM-yy" }}</td>
+                      <td>{{ estado.fechaTurno | date: "HH:mm" }}</td>
+                      <td>{{ estado.asistencia ? "SI" : "" }}</td>
+                      <td>{{ estado.apto === true ? 'SI' : estado.apto === false ? 'NO' : '' }}</td>
+                      <td>{{ estado.notificado ? "SI" : "" }}</td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn btn-sm align-middle p-0"
+                          *ngIf="estado.estadoSeguimientoId !== etapaActualId"
+                          (click)="eliminarEstado(estado.estadoSeguimientoId)"
+                        >
+                          <mat-icon
+                            fontIcon="cancel"
+                            class="align-content-end"
+                            style="font-size: 14px; color: red"
+                          ></mat-icon>
+                        </button>
+                        <span *ngIf="estado.estadoSeguimientoId === etapaActualId"> Actual </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <fieldset class="border g-2 mb-3 p-1 rounded row bg-light">
+                  <legend class="float-none w-auto px-3">Etapa Actual</legend>
+                      <div class="d-flex flex-wrap justify-content-around g-2">
+                        <div class="">
+                          <label for="etapa" class="form-label">Modificar</label>
+                          <select
+                            id="etapa"
+                            class="form-select"
+                            formControlName="etapaSeguimientoId"
+                            (change)="onEtapaChange()"
+                          >
+                            >
+                            <option
+                              *ngFor="let etapa of formData.etapaSeguimiento"
+                              [value]="etapa.etapaSeguimientoId"
+                            >
+                              {{ etapa.nombreEtapa }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="">
+                          <label for="fecha" class="form-label">Fecha</label>
+                          <input
+                            type="datetime-local"
+                            id="fecha"
+                            class="form-control"
+                            formControlName="fechaTurno"
+                          />
+                        </div>
+                        <div class="align-items-center d-flex flex-column gap-3 my-2 my-xl-0">
+
+                            <label for="asistencia" class="form-check-label"
+                              >Asistió</label
+                            >
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              id="asistencia"
+                              formControlName="asistencia"
+                            />
+                        </div>
+                      </div>
+                <div class="d-flex flex-wrap justify-content-around g-2">
+                  <div class="form-check mb-2">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="sinDefinir"
+                        formControlName="apto"
+                        [value]="null"
+                      />
+                      <label for="sinDefinir" class="form-check-label">Sin definir</label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="apto"
+                        formControlName="apto"
+                        [value]="true"
+                      />
+                      <label for="apto" class="form-check-label">Apto</label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        id="noApto"
+                        formControlName="apto"
+                        [value]="false"
+                      />
+                      <label for="noApto" class="form-check-label">No Apto</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input
+                          type="checkbox"
+                          class="form-check-input"
+                          id="notificado"
+                          formControlName="notificado"
+                        />
+                        <label for="notificado" class="form-check-label"
+                          >Notificado</label
+                        >
+                    </div>
+              </div>
+              </fieldset>
+                          </div>
+
+            <!-- div para barra divisora vertical -->
+            <div class="border-end d-none d-xl-block"></div>
+
+            <!--div para el estado general del postulante-->
+            <div class="col-12 col-xl-5 ">
+              <div class="d-xl-flex justify-content-around gap-2">
+                <div class="col-12 col-xl-6">
+                  <label for="etapa" class="form-label">Postulante a:</label>
+                  <select
+                    id="etapa"
+                    class="form-select"
+                    formControlName="tipoInscripcionId"
+                  >
+                    <option
+                      *ngFor="let tipo of formData.tiposInscripcion"
+                      [value]="tipo.tipoInscripcionId"
+                    >
+                      {{ tipo.tipoInscripcionNombre }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-12 col-xl-6">
+                  <label for="etapa" class="form-label">Estado General</label>
+                  <select
+                    id="etapa"
+                    class="form-select"
+                    formControlName="estadoId"
+                  >
+                    >
+                    <option
+                      *ngFor="let estado of formData.estados"
+                      [value]="estado.estadoId"
+                    >
+                      {{ estado.estadoNombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <hr>
+              <div class="mb-3">
+                <label for="observaciones" class="form-label"
+                  >Observaciones:</label
+                >
+                <textarea
+                  id="observaciones"
+                  formControlName="observacion"
+                  rows="5"
+                  class="form-control"
+                  appUppercase
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- <hr> -->
+          <div class="d-flex gap-2 justify-content-around mb-2">
+           <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="seguimientoFormGroup.invalid || guardando"
+            >
+              <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="BorrarPostulante(seguimiento.postulanteId)"
+              [disabled]="seguimientoFormGroup.invalid && eliminando && guardando"
+            >
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ eliminando ? 'Eliminando...' : 'Eliminar Posutalnte' }}
+
+            </button>
+          </div>
+        </fieldset>
+      </form>
+
