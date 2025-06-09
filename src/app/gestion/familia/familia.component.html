@@ -1,0 +1,102 @@
+
+<fieldset class="border p-1 rounded mb-3 row g-2">
+  <legend class="float-none w-auto px-3 d-flex align-items-center">
+    FAMILIARES
+    <button
+      *ngIf="habilitado"
+      class="btn btn-sm btn border-0 ms-auto"
+      (click)="toggleForm()"
+      type="button"
+    >
+      <mat-icon *ngIf="!showForm" fontIcon="add"></mat-icon>
+    </button>
+  </legend>
+
+  <!-- Tabla de familiares -->
+  <table class="table-bordered table-sm " *ngIf="familiares && familiares.length > 0">
+    <thead class="table-light">
+      <tr style="background-color:#f8f9fa">
+        <th>DNI</th>
+        <th>Apellido</th>
+        <th>Nombre</th>
+        <th>Parentesco</th>
+        <th>Convive</th>
+        <th>Empleado</th>
+        <th>Activo</th>
+        <th>Antec.</th>
+        <th>Visita</th>
+        <th *ngIf="habilitado">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fam of familiares" [ngClass]="{
+          'bg-secondary': fam.esEmpleado,
+          'force-bg-danger': fam.exInterno || fam.visita
+        }">
+        <td>{{ fam.dni }}</td>
+        <td>{{ fam.apellido }}</td>
+        <td>{{ fam.nombre }}</td>
+        <td>{{ fam.parentesco.parentescoNombre }}</td>
+        <td>{{ fam.convive ? 'Sí' : 'No' }}</td>
+        <td>{{ fam.esEmpleado ? 'Sí' : 'No' }}</td>
+        <td>{{ fam.activo ? 'Sí' : 'No' }}</td>
+        <td>{{ fam.exInterno ? "Sí" : "No" }}</td>
+        <td>{{ fam.visita ? "Sí" : "No" }}</td>
+        <td *ngIf="habilitado">
+          <button class="btn btn-sm btn-primary me-1" (click)="editar(fam.familiaresId)">Editar</button>
+          <button class="btn btn-sm btn-danger" (click)="eliminar(fam.familiaresId)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="familiares && familiares.length === 0" class="text-center text-muted">
+    Sin familiares cargados
+  </div>
+
+  <!-- Formulario -->
+  <form
+    *ngIf="showForm"
+    [formGroup]="familiarForm"
+    (ngSubmit)="agregar()"
+    class="d-flex flex-wrap gap-3 justify-content-center mb-3"
+  >
+    <div class="col-md-2">
+      <input #dniInput type="number" class="form-control form-control-sm" formControlName="dni" placeholder="DNI" />
+    </div>
+    <div class="col-md-2">
+      <input type="text" class="form-control form-control-sm" formControlName="apellido" placeholder="Apellido" />
+    </div>
+    <div class="col-md-2">
+      <input type="text" class="form-control form-control-sm" formControlName="nombre" placeholder="Nombre" />
+    </div>
+    <div class="col-md-2">
+      <select class="form-select form-select-sm" formControlName="parentescoId" >
+        <option value="" disabled >Parentesco</option>
+        <option *ngFor="let par of parentescos" [value]="par.parentescoId">
+          {{ par.parentescoNombre }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-1 d-flex flex-column align-items-center">
+      <label for="convive" class="form-check-label">Convive</label>
+      <input type="checkbox" class="form-check-input me-1" formControlName="convive" />
+    </div>
+    <div class="col-md-1 d-flex flex-column align-items-center">
+      <label for="esEmpleado" class="form-check-label">Empleado</label>
+      <input type="checkbox" class="form-check-input me-1" formControlName="esEmpleado" />
+    </div>
+    <div class="col-md-1 d-flex align-items-center" *ngIf="familiarForm.get('esEmpleado')?.value">
+      <input type="checkbox" class="form-check-input me-1" formControlName="activo" />
+      <label for="activo" class="form-check-label">Activo</label>
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-success w-100">
+        {{ editIndex !== null ? 'Actualizar' : 'Agregar' }}
+      </button>
+      <button  type="button" class="btn btn-sm btn-secondary w-100" (click)="cancelar()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</fieldset>

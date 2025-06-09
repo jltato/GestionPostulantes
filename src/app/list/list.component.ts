@@ -40,6 +40,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
   dtOptions: Config = {};
   private postulanteService = inject(PostulanteService)
 
+
   private baseUrl = environment.apiUrl;
   private apiKey =
     'gRnMxbEdZjkVr9m9jc18o4DcLu9CbD202KmzVp0m0LN-YPlZXUvXKgmp2GrJd9o6F1NfUFUKIyyGzh9LJ56G1LFZsJClNkbJjf-iCHhvLj1kO8oDaLKaS2pvtu1IcgsgFgqDuT4B0TieOpn8GEJuiUIM-VXUMvCR0JdsH9vWDr2KjewWqfCsQbnudLP2sUwz0vAWpLNaDPpFbXeq3V-xO7W1qlO9ETHtnoBBUHyrQQPIIiE4Ywc4oDsFkANjSxT9';
@@ -50,6 +51,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.estadoId = Number(this.route.snapshot.queryParamMap.get('est') ?? '1');
     this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
 
+
     combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
       ([params, queryParams]) => {
         const nuevoTipo = params.get('tipo')!;
@@ -57,6 +59,17 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tipo = nuevoTipo;
         this.estadoId = nuevoEstadoId;
         this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
+
+         // Ocultar o mostrar columna "Sector"
+        this.dtElement.dtInstance.then((dtInstance) => {
+          const mostrar = this.tipoPostulanteId === 3;
+          dtInstance.column(7).visible(mostrar); // columna "Sector"
+        });
+
+        this.dtElement.dtInstance.then((dtInstance) => {
+          const mostrar = this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3 ;
+          dtInstance.column(6).visible(mostrar); // columna "Establecimiento"
+        });
 
         this.rerender();
       },
@@ -69,11 +82,12 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
       tableOffsetTop = tabla.offset()!.top;
     }
     const availableHeight = windowHeight - tableOffsetTop - 300;
+
     this.dtOptions = {
       serverSide: true,
       stateSave: true,
       stateDuration: -1,
-      order: [],
+      order: [[1, 'desc']],
       lengthMenu: [
         [10, 25, 50, 100, -1],
         [10, 25, 50, 100, 'Todos'],
@@ -111,7 +125,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'ID', data: 'id' },
         {
           title: 'Fecha',
-          data: 'estadoFecha',
+          data: 'fechaSolicitud',
           render: function (data) {
             const date = new Date(data);
             return date.toLocaleDateString('es-AR');
@@ -121,11 +135,13 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'Nombres', data: 'nombre' },
         { title: 'Sexo', data: 'sexo' },
         { title: 'DNI', data: 'dni' },
-        { title: 'Estab. Solicitado', data: 'estabSolicitud' },
-        { title: 'Estado', data: 'estadoNombre' },
+        { title: 'Establecimiento', data: 'estabSolicitud', visible:(this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3) },
+        { title: 'Sector', data: 'nombreSector', visible:this.tipoPostulanteId === 3},
+        { title: 'Estado', data: 'estadoNombre'  },
         {
           title: 'Fecha',
           data: 'estadoFecha',
+          className: 'text-nowrap',
           render: function (data) {
             const date = new Date(data);
             return (
@@ -139,6 +155,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
             );
           },
         },
+
       ],
       dom:
         "<'row mb-2'<'col-sm-6 text-start'l><'col-sm-6 text-end'f>>" +
@@ -152,7 +169,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
           message: 'Listado de postulantes',
           messageTop: 'Postulantes',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8,9],
           },
         },
         {
@@ -160,7 +177,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'Listado de postulantes',
           messageTop: 'Listado de postulantes',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8,9],
           },
         },
         {
@@ -181,19 +198,36 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return row;
       },
       stateSaveCallback: (settings, data) => {
-        localStorage.setItem(this.storageKey, JSON.stringify(data));
+        sessionStorage.setItem(this.storageKey, JSON.stringify(data));
       },
 
       stateLoadCallback: () => {
-        const data = localStorage.getItem(this.storageKey);
+        const data = sessionStorage.getItem(this.storageKey);
         return data ? JSON.parse(data) : null;
       },
     };
   }
 
   ngAfterViewInit(): void {
-    this.dtTrigger.next(null);
-  }
+  this.dtTrigger.next(null);
+
+  combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
+    ([params, queryParams]) => {
+      const nuevoTipo = params.get('tipo')!;
+      const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
+      this.tipo = nuevoTipo;
+      this.estadoId = nuevoEstadoId;
+      this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
+
+      this.dtElement.dtInstance.then((dtInstance) => {
+        dtInstance.column(7).visible(this.tipoPostulanteId === 3); // Sector
+        dtInstance.column(6).visible(this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3 ); // Establecimiento
+      });
+
+      this.rerender();
+    }
+  );
+}
 
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
@@ -218,7 +252,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resetearEstadoDataTable() {
     this.storageKey = `DataTables_${this.router.url}`;
-    localStorage.removeItem(this.storageKey);
+    sessionStorage.removeItem(this.storageKey);
   }
 
   ClickHandler(id: number) {

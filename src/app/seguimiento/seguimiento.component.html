@@ -153,7 +153,8 @@
             <!--div para el estado general del postulante-->
             <div class="col-12 col-xl-5 ">
               <div class="d-xl-flex justify-content-around gap-2">
-                <div class="col-12 col-xl-6">
+
+                <div class="col">
                   <label for="etapa" class="form-label">Postulante a:</label>
                   <select
                     id="etapa"
@@ -168,7 +169,24 @@
                     </option>
                   </select>
                 </div>
-                <div class="col-12 col-xl-6">
+
+                <div class="col"  *ngIf="tipo === 3">
+                  <label for="etapa" class="form-label">Sector Profesión:</label>
+                  <select
+                    id="etapa"
+                    class="form-select"
+                    formControlName="sectorSolicitudId"
+                  >
+                    <option
+                      *ngFor="let sector of formData.sectorSolicitud"
+                      [value]="sector.sectorSolicitudId"
+                    >
+                      {{ sector.nombreSector }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col">
                   <label for="etapa" class="form-label">Estado General</label>
                   <select
                     id="etapa"
@@ -218,7 +236,6 @@
             >
             <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               {{ eliminando ? 'Eliminando...' : 'Eliminar Posutalnte' }}
-
             </button>
           </div>
         </fieldset>

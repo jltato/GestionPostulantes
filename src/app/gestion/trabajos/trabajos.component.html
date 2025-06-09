@@ -1,0 +1,132 @@
+<fieldset class="border p-1 rounded mb-3 row g-2">
+
+  <legend class="float-none w-auto px-3">
+    TRABAJOS
+    <button
+        class="btn btn-sm btn border-0 ms-auto"
+        *ngIf="habilitado"
+        (click)="toggleForm()"
+        type="button"
+    >
+        <mat-icon *ngIf="!showForm" fontIcon="add"></mat-icon>
+    </button>
+  </legend>
+
+  <!-- Tabla de trabajos -->
+  <table
+    class="table table-bordered table-sm"
+    *ngIf="trabajos && trabajos.length > 0"
+  >
+    <thead class="table-light">
+      <tr>
+        <th>Actividad</th>
+        <th>Desde</th>
+        <th>Hasta</th>
+        <th>Intento anterior</th>
+        <th>Otra fuerza</th>
+        <th>Motivo baja</th>
+        <th *ngIf="habilitado">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let trabajo of trabajos">
+        <td>{{ trabajo.actividadLaboral }}</td>
+        <td>{{ trabajo.desde | date: "dd-MM-yyyy" }}</td>
+        <td>{{ trabajo.hasta | date: "dd-MM-yyyy" }}</td>
+        <td>{{ trabajo.intentoAnterior ? 'Sí' : 'No' }}</td>
+        <td>{{ trabajo.otraFuerza ? 'Sí' : 'No' }}</td>
+        <td>{{ trabajo.motivoBaja || '-' }}</td>
+        <td *ngIf="habilitado">
+          <button class="btn btn-sm btn-primary me-1" (click)="editarTrabajo(trabajo.trabajoId)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminarTrabajo(trabajo.trabajoId)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Mensaje si no hay trabajos -->
+  <div *ngIf="!trabajos || trabajos.length === 0" class="text-center">
+    Sin trabajos cargados
+  </div>
+
+
+
+  <!-- Formulario -->
+  <form
+    *ngIf="showForm"
+    [formGroup]="trabajoForm"
+    (ngSubmit)="agregarTrabajo()"
+    class="d-flex flex-wrap gap-2 justify-content-center mb-3"
+  >
+    <div class="col-md-3">
+      <label for="actividadLaboral">Actividad Laboral:</label>
+      <input
+        #actividadInput
+        class="form-control form-control-sm"
+        formControlName="actividadLaboral"
+        placeholder="Actividad laboral"
+      />
+    </div>
+
+    <div class="col-md-2">
+      <label for="desde">Desde:</label>
+      <input
+        type="date"
+        class="form-control form-control-sm"
+        formControlName="desde"
+      />
+    </div>
+
+    <div class="col-md-2">
+      <label for="hasta">Hasta:</label>
+      <input
+        type="date"
+        class="form-control form-control-sm"
+        formControlName="hasta"
+      />
+    </div>
+
+    <div class="col-md-2 d-flex align-items-center">
+      <input
+        type="checkbox"
+        formControlName="intentoAnterior"
+        id="intentoAnterior"
+        class="form-check-input"
+      />
+      <label for="intentoAnterior" class="form-check-label ms-1">Intento anterior</label>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-center">
+      <input
+        type="checkbox"
+        formControlName="otraFuerza"
+        id="otraFuerza"
+        class="form-check-input"
+      />
+      <label for="otraFuerza" class="form-check-label ms-1">Otra fuerza</label>
+    </div>
+
+    <div class="col-md-3">
+      <input
+        *ngIf="trabajoForm.value.otraFuerza"
+        class="form-control form-control-sm"
+        formControlName="motivoBaja"
+        placeholder="Motivo de baja"
+      />
+    </div>
+
+    <div class="col-md-3 d-flex gap-2 justify-content-center">
+      <button type="submit" class="btn btn-success btn-sm">
+        {{ editIndex !== null ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn btn-danger btn-sm" (click)="toggleForm()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</fieldset>
+

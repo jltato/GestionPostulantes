@@ -140,7 +140,7 @@
               <label class="form-label small"> Edad </label>
               <input
                 type="text"
-                class="form-control form-control-sm"
+                class="form-control form-control-sm {{getEdadClass()}}"
                 value="{{ edad }}"
                 disabled="true"
               />
@@ -251,6 +251,17 @@
               />
             </div>
 
+             <!-- IMC -->
+            <div class="col-12 col-md-2 col-xl-1 form-floating">
+              <label class="form-label small"> IMC </label>
+              <input
+                type="text"
+                class="form-control form-control-sm {{ getIMCClass() }}"
+                value="{{ IMC }}"
+                disabled="true"
+              />
+            </div>
+
             <!-- Cantidad de tatuajes -->
             <div class="col-12 col-md-3 col-xl-2 form-floating">
               <label class="form-label small">Tatuajes</label>
@@ -313,153 +324,54 @@
             </div>
           </fieldset>
 
-
           <!-- Contactos -->
-          <fieldset class="border p-1 rounded mb-3 row g-2 p-2">
-            <legend class="float-none w-auto px-3">CONTACTO</legend>
-            <table class="table table-bordered table-sm">
-              <thead class="table-light">
-                <tr>
-                  <th>Teléfono:</th>
-                  <th>Pertenece a:</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let contacto of postulante.contactos">
-                  <td>{{ contacto.telefono }}</td>
-                  <td>{{ contacto.perteneciente }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </fieldset>
+          <app-contactos
+            [contactos]="postulante.contactos"
+            [habilitado] = "habilitado"
+            [postulanteId]="postulante.postulanteId"
+            (contactosChange)="actualizarContactos($event)"
+            >
+          </app-contactos>
+
           <!-- Estudios -->
+          <app-estudios
+          [estudios]="postulante.estudios"
+          [habilitado] = "habilitado"
+          [postulanteId]="postulante.postulanteId"
+          [niveles]="formData.nivelEstudios"
+          (estudiosChange)="actualizarEstudios($event)"
+          ></app-estudios>
 
-          <fieldset class="border p-1 rounded mb-3 row g-2">
-            <legend class="float-none w-auto px-3">ESTUDIOS</legend>
-            <table class="table table-bordered table-sm">
-              <thead class="table-light">
-                <tr>
-                  <th>Nivel</th>
-                  <th>Título</th>
-                  <th>Instituto</th>
-                  <th>Año egreso</th>
-                  <th>En curso</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let estudio of postulante.estudios">
-                  <td>{{ estudio.nivelEstudios.nivelNombre }}</td>
-                  <td>{{ estudio.titulo }}</td>
-                  <td>{{ estudio.institutoEducativo }}</td>
-                  <td>{{ estudio.anoEgreso }}</td>
-                  <td>{{ estudio.enCurso ? "Sí" : "No" }}</td>
-                </tr>
-                <tr
-                  *ngIf="
-                    !postulante.estudios || postulante.estudios.length === 0
-                  "
-                >
-                  <td colspan="5" class="text-center">Sin estudios cargados</td>
-                </tr>
-              </tbody>
-            </table>
-          </fieldset>
           <!-- trabajo -->
+          <app-trabajos
+          [trabajos]="postulante.trabajos"
+          [habilitado]="habilitado"
+          [postulanteId]="postulante.postulanteId"
+          (trabajosChange)="actualizarTrabajos($event)"
+          >
+          </app-trabajos>
 
-          <fieldset class="border p-1 rounded mb-3 row g-2">
-            <legend class="float-none w-auto px-3">TRABAJO</legend>
-            <table
-              class="table table-bordered table-sm"
-              *ngIf="postulante.trabajos && postulante.trabajos.length > 0"
-            >
-              <thead class="table-light">
-                <tr>
-                  <th>Actividad</th>
-                  <th>Desde</th>
-                  <th>Hasta</th>
-                  <th>Intento anterior</th>
-                  <th>Otra fuerza</th>
-                  <th>Motivo baja</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let trabajo of postulante.trabajos">
-                  <td>{{ trabajo.actividadLaboral }}</td>
-                  <td>{{ trabajo.desde | date: "dd-MM-yyyy" }}</td>
-                  <td>{{ trabajo.hasta | date: "dd-MM-yyyy" }}</td>
-                  <td>{{ trabajo.intentoAnterior ? "Sí" : "No" }}</td>
-                  <td>{{ trabajo.otraFuerza ? "Sí" : "No" }}</td>
-                  <td>{{ trabajo.motivoBaja || "-" }}</td>
-                </tr>
-              </tbody>
-            </table>
 
-            <div
-              *ngIf="!postulante.trabajos || postulante.trabajos.length === 0"
-              class="text-center"
-            >
-              Sin trabajos cargados
-            </div>
-          </fieldset>
           <!-- Familiares -->
-
-          <fieldset class="border p-1 rounded mb-3 row g-2">
-            <legend class="float-none w-auto px-3">FAMILIA</legend>
-            <table
-              class="table-bordered table-sm "
-              *ngIf="Familiares && Familiares.length > 0"
-            >
-              <thead class="table-light">
-                <tr>
-                  <th>DNI</th>
-                  <th>Apellido</th>
-                  <th>Nombre</th>
-                  <th>Parentesco</th>
-                  <th>Convive</th>
-                  <th>Empleado</th>
-                  <th>Activo</th>
-                  <th>Antec.</th>
-                  <th>Visita</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let fam of Familiares" [ngClass]="{
-                  'bg-secondary': fam.esEmpleado,
-                  'force-bg-danger': fam.exInterno || fam.visita
-                }">
-                  <td>{{ fam.dni }}</td>
-                  <td>{{ fam.apellido }}</td>
-                  <td>{{ fam.nombre }}</td>
-                  <td>{{ fam.parentesco }}</td>
-                  <td>{{ fam.convive ? "Sí" : "No" }}</td>
-                  <td>{{ fam.esEmpleado ? "Sí" : "No" }}</td>
-                  <td>{{ fam.activo ? "Sí" : "No" }}</td>
-                  <td>{{ fam.exInterno ? "Sí" : "No" }}</td>
-                  <td>{{ fam.visita ? "Sí" : "No" }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div
-              *ngIf="
-                !Familiares || Familiares.length === 0
-              "
-              class="text-center"
-            >
-              Sin familiares cargados
-            </div>
-          </fieldset>
+          <app-familiar
+          [familiares]="Familiares"
+          [habilitado]="habilitado"
+          [postulanteId]="postulante.postulanteId"
+          [parentescos]="formData.parentescos"
+          (familiaresChange)="actualizarFamiliares($event)"
+          ></app-familiar>
 
           <!-- Observaciones -->
           <fieldset class="border p-1 rounded mb-3 row g-2">
             <legend class="float-none w-auto px-3">OBSERVACIONES</legend>
             <div class="col-12 form-floating">
-              <label class="form-label small">Observaciones</label>
+              <!-- <label class="form-label small">Observaciones</label> -->
               <textarea
                 class="form-control form-control-sm"
                 rows="3"
                 formControlName="observaciones"
                 appUppercase
+                readonly="true"
               ></textarea>
             </div>
           </fieldset>

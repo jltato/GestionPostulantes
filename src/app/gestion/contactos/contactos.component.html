@@ -1,0 +1,51 @@
+<fieldset class="border p-1 rounded mb-3 row g-2 p-2">
+  <legend class="float-none w-auto px-3 d-flex justify-content-between align-items-center w-100">
+    CONTACTO
+
+    <button class="btn btn-sm btn border-0 ms-auto "
+      *ngIf="habilitado"
+      (click)="toggleForm()"
+      type="button">
+      <mat-icon *ngIf="!showForm" fontIcon="add"></mat-icon>
+    </button>
+  </legend>
+
+
+
+  <table class="table table-bordered table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Teléfono:</th>
+        <th>Pertenece a:</th>
+        <th *ngIf="habilitado">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let contacto of contactos">
+        <td>{{ contacto.telefono }}</td>
+        <td>{{ contacto.perteneciente }}</td>
+        <td *ngIf="habilitado" class="d-flex justify-content-center gap-2">
+          <button class="btn btn-primary btn-sm me-1" (click)="editarContacto(contacto.contactoId)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarContacto(contacto.contactoId)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <form *ngIf="showForm" [formGroup]="contactoForm" (ngSubmit)="agregarContacto()" class="row g-2 mb-3">
+    <div class="col-md-4">
+      <input #telefonoInput class="form-control form-control-sm" formControlName="telefono" placeholder="Teléfono" />
+    </div>
+    <div class="col-md-5">
+      <input class="form-control form-control-sm" formControlName="perteneciente" placeholder="Pertenece a" />
+    </div>
+     <div class="col-md-3 d-flex gap-2 justify-content-center">
+      <button type="submit" class="btn btn-success btn-sm">{{ editIndex !== null ? 'Actualizar' : 'Guardar' }}</button>
+      <button type ="button" class="btn btn-danger btn-sm" (click)="toggleForm()">cancelar</button>
+    </div>
+  </form>
+
+</fieldset>
+

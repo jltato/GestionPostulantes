@@ -1,0 +1,118 @@
+<fieldset class="border p-1 rounded mb-3 row g-2 p-2">
+  <legend class="float-none w-auto px-3 d-flex justify-content-between align-items-center w-100">
+    ESTUDIOS
+
+    <button
+      class="btn btn-sm btn border-0 ms-auto"
+      *ngIf="habilitado"
+      (click)="toggleForm()"
+      type="button"
+    >
+      <mat-icon *ngIf="!showForm" fontIcon="add"></mat-icon>
+    </button>
+  </legend>
+
+  <table class="table table-bordered table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Nivel</th>
+        <th>Título</th>
+        <th>Instituto</th>
+        <th>Año egreso</th>
+        <th>En curso</th>
+        <th *ngIf="habilitado">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let estudio of estudios">
+        <td>{{ estudio.nivelEstudios.nivelNombre }}</td>
+        <td>{{ estudio.titulo }}</td>
+        <td>{{ estudio.institutoEducativo }}</td>
+        <td>{{ estudio.anoEgreso }}</td>
+        <td>{{ estudio.enCurso ? 'Sí' : 'No' }}</td>
+        <td *ngIf="habilitado" class="d-flex justify-content-center gap-2">
+          <button
+            class="btn btn-primary btn-sm me-1"
+            (click)="editarEstudio(estudio.estudiosId)"
+          >
+            Editar
+          </button>
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="eliminarEstudio(estudio.estudiosId)"
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="!estudios || estudios.length === 0">
+        <td colspan="6" class="text-center">Sin estudios cargados</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <form
+    *ngIf="showForm"
+    [formGroup]="estudioForm"
+    (ngSubmit)="agregarEstudio()"
+    class="d-flex flex-wrap gap-2 justify-content-center mb-3"
+  >
+    <div class="col-md-3">
+      <select
+        class="form-select form-select-sm"
+        formControlName="nivelEstudiosId"
+        aria-label="Nivel de Estudios"
+      >
+        <option *ngFor="let nivel of niveles" [value]="nivel.nivelEstudiosId">
+          {{ nivel.nivelNombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <input
+        #tituloInput
+        class="form-control form-control-sm"
+        formControlName="titulo"
+        placeholder="Título"
+      />
+    </div>
+
+    <div class="col-md-3">
+      <input
+        class="form-control form-control-sm"
+        formControlName="institutoEducativo"
+        placeholder="Instituto"
+      />
+    </div>
+
+    <div class="col-md-1">
+      <input
+        type="number"
+        class="form-control form-control-sm"
+        formControlName="anoEgreso"
+        placeholder="Año"
+      />
+    </div>
+
+    <div class="col-md-3 d-flex align-items-center">
+      <input
+        type="checkbox"
+        formControlName="enCurso"
+        id="enCurso"
+        class="form-check-input"
+      />
+      <label for="enCurso" class="form-check-label ms-1">En curso</label>
+    </div>
+
+    <div class="col-md-3 d-flex gap-2 justify-content-center">
+      <button type="submit" class="btn btn-success btn-sm">
+        {{ editIndex !== null ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn btn-danger btn-sm" (click)="toggleForm()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</fieldset>
+

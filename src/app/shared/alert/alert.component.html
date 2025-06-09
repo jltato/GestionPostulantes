@@ -1,0 +1,34 @@
+<!-- Alerta simple -->
+<div *ngIf="alertVisible" class="modal fade">
+   <div class="modal-dialog modal-dialog-centered">+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ title }}</h3>
+      </div>
+      <div class="modal-body g-3 px-4">
+         <p>{{ message }}</p>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-success" (click)="closeAlert()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmación -->
+<div  *ngIf="confirmVisible" class="modal fade">
+  <div class="modal-dialog modal-dialog-centered">+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ title }}</h3>
+      </div>
+      <div class="modal-body g-3 px-4">
+        <p>{{ message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" (click)="confirm(true)">Sí</button>
+        <button class="btn btn-danger" (click)="confirm(false)">No</button>
+      </div>
+     </div>
+  </div>
+</div>

@@ -21,6 +21,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { UppercaseDirective } from '../directivas/uppercase.directive';
 import { SeguimientoComponent } from "../seguimiento/seguimiento.component";
+import { ContactoComponent } from './contactos/contactos.component';
+import { EstudiosComponent } from "./estudios/estudios.component";
+import { TrabajosComponent } from "./trabajos/trabajos.component";
+import { FamiliarComponent } from "./familia/familia.component";
 
 @Component({
   selector: 'app-gestion',
@@ -36,7 +40,11 @@ import { SeguimientoComponent } from "../seguimiento/seguimiento.component";
     MatNativeDateModule,
     MatDatepickerModule,
     UppercaseDirective,
-    SeguimientoComponent
+    SeguimientoComponent,
+    ContactoComponent,
+    EstudiosComponent,
+    TrabajosComponent,
+    FamiliarComponent
 ],
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.css',
@@ -56,6 +64,7 @@ export class GestionComponent implements OnInit {
   public edadMaxima = 24;
   maxFechaNacimiento: Date = new Date();
   edad = 0;
+  IMC = 0;
   fotoLista = true;
   Familiares:any;
   antecedentes = false;
@@ -132,16 +141,17 @@ export class GestionComponent implements OnInit {
         this.postulanteId = postulante.postulanteId;
         this.cargarDatos(postulante);
         this.getEdad(postulante.fechaNac);
+        const altura  = parseInt(postulante.datosPersonales.altura ?? "");
+        const peso = parseInt(postulante.datosPersonales.peso ?? "");
+        this.getIMC(altura, peso)
         this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
           next: (verificado)=>{
             this.antecedentes = verificado[0].exInterno;
             this.visitante = verificado[0].visitante;
-            console.log(verificado);
           }
         });
         this.postulanteService.getFamiliares(postulante.postulanteId).subscribe({
            next: (Familiares)=>{
-            console.log(Familiares);
             this.Familiares = Familiares;
             this.famVisitante = false;
             this.famAntecedente = false;
@@ -218,20 +228,19 @@ export class GestionComponent implements OnInit {
       const mes = fechaCalculo.getMonth() - fecha.getMonth();
       const dia = fechaCalculo.getDate() - fecha.getDate();
       const edadExacta = mes < 0 || (mes === 0 && dia < 0) ? edad - 1 : edad;
-
       return edadExacta < 19 ? { edadMinima: true } : null;
     };
   }
 
-  tipoInscripcion(tipo: string): number {
-    switch (tipo.toLowerCase()) {
-      case 'cadete':
+  tipoInscripcion(tipo: number): number {
+    switch (tipo) {
+      case 1:
         this.edadMaxima = 24;
         return 1;
-      case 'suboficial':
+      case 2:
         this.edadMaxima = 34;
         return 2;
-      case 'profesional':
+      case 3:
         this.edadMaxima = 99;
         return 3;
       default:
@@ -240,6 +249,7 @@ export class GestionComponent implements OnInit {
   }
 
   cargarDatos(postulante: any): void {
+    this.tipoInscripcion(postulante.seguimiento.tipoInscripcionId)
     this.InicialFormGroup.patchValue({
       nombre: postulante.nombre,
       apellido: postulante.apellido,
@@ -300,6 +310,29 @@ export class GestionComponent implements OnInit {
     this.edad = edad;
   }
 
+  getEdadClass():string{
+    const fecha = new Date(this.postulante.fechaNac);
+    const hoy = new Date();
+    const fechaCalculo = new Date(hoy.getFullYear() + 1, 3, 1);
+    const edad = fechaCalculo.getFullYear() - fecha.getFullYear();
+    const mes = fechaCalculo.getMonth() - fecha.getMonth();
+    const dia = fechaCalculo.getDate() - fecha.getDate();
+    const edadExacta = mes < 0 || (mes === 0 && dia < 0) ? edad - 1 : edad;
+
+    if(edadExacta>this.edadMaxima) return 'text-danger';
+    return '';
+  }
+
+  getIMC(altura:number, peso:number){
+    this.IMC = Math.round(peso / Math.pow(altura / 100, 2));
+  }
+  getIMCClass(): string {
+  if (this.IMC < 18.5) return 'text-success';        // Bajo peso
+  if (this.IMC < 25) return '';                      // Normal
+  if (this.IMC < 30) return 'text-warning';         // Sobrepeso
+  return 'text-danger';                             // Obesidad
+}
+
   habilitar(){
      this.InicialFormGroup.enable();
      this.habilitado=true;
@@ -309,6 +342,7 @@ export class GestionComponent implements OnInit {
     this.InicialFormGroup.disable();
     this.habilitado=false;
   }
+
   guardar(){
     this.guardando=true;
 
@@ -326,6 +360,8 @@ export class GestionComponent implements OnInit {
       nacionalidadId: form.nacionalidadId,
       nacionalizado: form.nacionalizado,
       datosPersonales: {
+        postulanteId: this.postulante.postulanteId,
+        datosPersonalesId: this.postulante.datosPersonales.datosPersonalesId,
         generoId: form.generoId,
         estadoCivilId: form.estadoCivilId,
         altura: form.altura,
@@ -336,23 +372,28 @@ export class GestionComponent implements OnInit {
       },
       domicilios: [
         {
-          domicilioId: this.postulante.domicilios[0].domicilioId, // ID original
+          domicilioId: this.postulante.domicilios[0].domicilioId,
+          postulanteId: this.postulante.postulanteId,
           calle: form.calle,
           numero: form.numero,
           localidadId: form.localidadId,
           codigoPostal: form.codigoPostal
         }
-      ]
+      ],
+      contactos: this.postulante.contacto,
+      estudios: this.postulante.estudios,
+      trabajos: this.postulante.trabajos,
+      familiares: this.Familiares,
     }
 
 
     this.postulanteService.putPostulante(this.postulanteId, postulante).subscribe({
       next: (res) => {
-        console.log('Postulante actualizado con éxito', res);
+        console.log(res);
+        this.cargarPostulante(res);
         this.guardando = false;
         this.habilitado=false;
-        const dateString = this.InicialFormGroup.value.fechaNac ?? "";
-        this.getEdad(new Date(dateString));
+
         this.InicialFormGroup.disable();
 
 
@@ -364,6 +405,19 @@ export class GestionComponent implements OnInit {
       }
     })
 
+  }
+
+  actualizarContactos(contactosModificados: any[]) {
+    this.postulante.contacto = [...contactosModificados];
+  }
+  actualizarEstudios(nuevosEstudios: any[]) {
+    this.postulante.estudios = [...nuevosEstudios];
+  }
+   actualizarTrabajos(nevosTrabajos: any[]) {
+    this.postulante.trabajos = [...nevosTrabajos];
+  }
+  actualizarFamiliares(nuevosFamiliares: any[]) {
+    this.Familiares = [...nuevosFamiliares];
   }
 
 }
