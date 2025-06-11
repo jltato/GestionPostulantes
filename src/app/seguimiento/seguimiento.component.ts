@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import {
-  FormBuilder,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder,  ReactiveFormsModule,  Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostulanteService } from '../Services/postulante.service';
 import { MatIcon } from '@angular/material/icon';
@@ -14,17 +9,17 @@ import { AlertService } from '../Services/alert.service';
 
 @Component({
   selector: 'app-seguimiento',
-  imports: [  FormsModule, ReactiveFormsModule, CommonModule, MatIcon,],
+  standalone : true,
+  imports: [CommonModule, MatIcon, ReactiveFormsModule],
   templateUrl: './seguimiento.component.html',
   styleUrl: './seguimiento.component.css'
 })
 export class SeguimientoComponent implements OnInit, OnChanges  {
 
-  constructor(private alert: AlertService) {}
-
   @Input() seguimiento: any;
   @Input() formData: any;
 
+  private alert = inject(AlertService)
   private _formBuilder = inject(FormBuilder);
   private postulanteService = inject(PostulanteService);
   private router = inject(Router);
@@ -100,7 +95,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     };
 
     this.postulanteService.postSeguimiento(seguimientoPayload).subscribe({
-      next: (seguimiento) => {
+      next: (seguimiento: any) => {
         this.etapaActualId = seguimiento.estadoSeguimientoActualId;
         this.seguimiento.estadosSeguimiento =
           seguimiento.estadosSeguimiento;
@@ -122,7 +117,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
         });
         this.guardando = false;
       },
-      error: (err) => {
+      error: (err:any) => {
         this.error = err.message;
         this.guardando = false;
         console.log(err);
@@ -142,7 +137,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     if (confirmado) {
       this.guardando = true;
       this.postulanteService.eliminarEstado(estadoId).subscribe({
-        next: (seguimiento) => {
+        next: (seguimiento: any) => {
           this.seguimiento.estadosSeguimiento =
             seguimiento.estadosSeguimiento;
           this.seguimientoId = seguimiento.seguimientoId;
@@ -164,7 +159,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
           });
           this.guardando = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           this.error = err.error;
           console.log(err);
           this.guardando = false;

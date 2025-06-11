@@ -1,12 +1,12 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 
 
 @Component({
   selector: 'app-trabajos',
-  imports: [CommonModule, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule],
   templateUrl: './trabajos.component.html',
   styleUrl: './trabajos.component.css',
   standalone: true,
@@ -17,22 +17,21 @@ export class TrabajosComponent {
 @Input() habilitado = false;
 @Output() trabajosChange = new EventEmitter<Trabajo[]>();
 
-  trabajoForm: FormGroup;
-  showForm = false;
-  editIndex: number | null = null;
-
-   @ViewChild('actividadInput') actividadInput!: ElementRef;
-
-  constructor(private fb: FormBuilder) {
-    this.trabajoForm = this.fb.group({
-      actividadLaboral: ['', Validators.required],
+  fb = inject(FormBuilder);
+  trabajoForm: FormGroup = this.fb.group({
+    actividadLaboral: ['', Validators.required],
       desde: ['', Validators.required],
       hasta: ['', Validators.required],
       intentoAnterior: [false],
       otraFuerza: [false],
       motivoBaja: [''],
-    });
-  }
+  })
+  showForm = false;
+  editIndex: number | null = null;
+
+   @ViewChild('actividadInput') actividadInput!: ElementRef;
+
+
 
    toggleForm() {
     this.showForm = !this.showForm;

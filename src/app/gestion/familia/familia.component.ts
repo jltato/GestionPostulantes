@@ -1,15 +1,13 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-
-
 
 
 @Component({
   selector: 'app-familiar',
   templateUrl: './familia.component.html',
-  imports: [CommonModule, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule],
   standalone: true,
 })
 
@@ -21,13 +19,12 @@ export class FamiliarComponent implements OnInit {
 
   @Output() familiaresChange = new EventEmitter<Familiar[]>();
 
+  fb =inject(FormBuilder);
   familiarForm!: FormGroup;
   editIndex: number | null = null;
   showForm = false;
 
   @ViewChild('dniInput') dniInput!: ElementRef;
-
-  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.initForm();

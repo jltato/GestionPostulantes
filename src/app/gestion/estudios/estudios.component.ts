@@ -1,12 +1,11 @@
-import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-estudios',
-  imports: [CommonModule, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule],
   templateUrl: './estudios.component.html',
   styleUrl: './estudios.component.css'
 })
@@ -20,19 +19,19 @@ export class EstudiosComponent {
 
   @ViewChild('tituloInput') tituloInput!: ElementRef;
 
-  estudioForm: FormGroup;
-  showForm = false;
-  editIndex: number | null = null;
+  private fb = inject(FormBuilder);
 
-  constructor(private fb: FormBuilder) {
-    this.estudioForm = this.fb.group({
-      nivelEstudiosId: [null, Validators.required],
+  estudioForm: FormGroup = this.fb.group({
+     nivelEstudiosId: [null, Validators.required],
       titulo: ['', Validators.required],
       institutoEducativo: ['', Validators.required],
       enCurso: [false],
       anoEgreso: [null]
-    });
-  }
+  });
+
+  showForm = false;
+  editIndex: number | null = null;
+
 
 
   agregarEstudio() {

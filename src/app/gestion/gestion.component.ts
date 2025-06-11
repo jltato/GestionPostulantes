@@ -6,12 +6,11 @@ import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   Validators,
-  FormsModule,
-  ReactiveFormsModule,
   ValidatorFn,
   ValidationErrors,
   AbstractControl,
   FormGroup,
+  ReactiveFormsModule,
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -31,8 +30,6 @@ import { FamiliarComponent } from "./familia/familia.component";
   imports: [
     RouterModule,
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatInputModule,
@@ -44,8 +41,10 @@ import { FamiliarComponent } from "./familia/familia.component";
     ContactoComponent,
     EstudiosComponent,
     TrabajosComponent,
-    FamiliarComponent
+    FamiliarComponent,
+    ReactiveFormsModule
 ],
+  standalone:true,
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.css',
 })
@@ -53,14 +52,15 @@ import { FamiliarComponent } from "./familia/familia.component";
 export class GestionComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+   private _formBuilder = inject(FormBuilder);
+  private postulanteService = inject(PostulanteService);
+
   postulante: any;
   imagenUrl: any;
-  private postulanteService = inject(PostulanteService);
   postulanteIds: number[] = [];
   currentIndex = 0;
   idActual!: number;
   formData: any;
-  private _formBuilder = inject(FormBuilder);
   public edadMaxima = 24;
   maxFechaNacimiento: Date = new Date();
   edad = 0;

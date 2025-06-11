@@ -1,15 +1,15 @@
 
-import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-contactos',
-  imports: [CommonModule, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule],
   templateUrl: './contactos.component.html',
-  styleUrl: './contactos.component.css'
+  styleUrl: './contactos.component.css',
+  standalone:true,
 })
 
 export class ContactoComponent {
@@ -20,16 +20,17 @@ export class ContactoComponent {
 
   @ViewChild('telefonoInput') telefonoInput!: ElementRef;
 
-  contactoForm: FormGroup;
+
   showForm = false;
   editIndex: number | null = null;
 
-  constructor(private fb: FormBuilder) {
-    this.contactoForm = this.fb.group({
-      telefono: [''],
-      perteneciente: ['']
-    });
-  }
+   private fb = inject(FormBuilder);
+
+  contactoForm: FormGroup = this.fb.group({
+    telefono: [''],
+    perteneciente: ['']
+  });
+
 
   agregarContacto() {
   if (this.contactoForm.valid) {
