@@ -67,17 +67,34 @@
               ],
               "outputHashing": "all"
             },
-            "development": {
+           "development": {
+              "outputPath": "dist/gestion-postulantes-dev",
               "optimization": false,
-              "extractLicenses": false,
               "sourceMap": true,
+              "namedChunks": true,
+              "aot": false,
+              "extractLicenses": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.development.ts"
                 }
               ]
-            }
+            },
+            "test": {
+                "outputPath": "dist/gestion-postulantes-test",
+                "optimization": true,
+                "sourceMap": true,
+                "namedChunks": true,
+                "aot": true,
+                "extractLicenses": false,
+                "fileReplacements": [
+                  {
+                    "replace": "src/environments/environment.ts",
+                    "with": "src/environments/environment.test.ts"
+                  }
+                ]
+              }
           },
           "defaultConfiguration": "production"
         },

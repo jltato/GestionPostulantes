@@ -40,11 +40,15 @@
   <span class="spacer"></span>
   <button mat-button class="text-light" [matMenuTriggerFor]="menu">Menu</button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="cambiarEstado(0)">Todos</button>
-    <button mat-menu-item (click)="cambiarEstado(1)">Pendientes</button>
-    <button mat-menu-item (click)="cambiarEstado(2)">En Proceso</button>
-    <button mat-menu-item (click)="cambiarEstado(3)">Aptos</button>
-    <button mat-menu-item (click)="cambiarEstado(4)">No Aptos</button>
-    <button mat-menu-item (click)="cambiarEstado(5)">En Reserva</button>
+    @for (estado of estados; track $index) {
+      <button
+          mat-menu-item
+          (click)="cambiarEstado(estado.value)">
+          {{ estado.label }}
+      </button>
+   }
   </mat-menu>
+  <span><mat-icon (click)="abrirConfiguracion()" matTooltip="Configuraciones">settings</mat-icon></span>
 </mat-toolbar>
+
+

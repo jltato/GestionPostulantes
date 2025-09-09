@@ -109,7 +109,10 @@ export class GestionComponent implements OnInit {
     observaciones: [''],
   });
 
+
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   ngOnInit(): void {
     this.postulanteService.getFormData().subscribe((data: any) => {
@@ -127,7 +130,6 @@ export class GestionComponent implements OnInit {
         }
       });
     });
-
     const hoy = new Date();
     this.maxFechaNacimiento = new Date(hoy.getFullYear() - 17, 2, 30);
   }
@@ -206,6 +208,26 @@ export class GestionComponent implements OnInit {
       this.router.navigate(['../', anteriorId], { relativeTo: this.route });
     }
   }
+
+//   dniValidator(): ValidatorFn {
+//     return (control: AbstractControl): ValidationErrors | null => {
+//       const value = control.value;
+//       if (!value) return null; // si está vacío, que lo maneje el required
+
+//   // eliminar puntos si vienen del mask
+//   const numericValue = Number(String(value).replace(/\./g, ''));
+
+//   if (isNaN(numericValue)) {
+//     return { invalidNumber: true };
+//   }
+
+//   if (numericValue < 1000000 || numericValue > 99999999) {
+//     return { outOfRange: true };
+//   }
+
+//   return null; // válido
+//   }
+// }
 
   edadMaximaValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -419,5 +441,4 @@ export class GestionComponent implements OnInit {
   actualizarFamiliares(nuevosFamiliares: any[]) {
     this.Familiares = [...nuevosFamiliares];
   }
-
 }

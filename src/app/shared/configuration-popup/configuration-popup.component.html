@@ -1,0 +1,64 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+
+<div class="p-3">
+  <div class="d-flex justify-content-end">
+    <button class="btn-close" (click)="cerrar()"> </button>
+  </div>
+
+  <div class="popup d-flex">
+    <!-- Menu lateral -->
+    <div class="menu flex-shrink-0 me-3" style="width: 250px;">
+      <ul class="list-group">
+        <li class="list-group-item">
+          <button class="btn w-100 text-start" (click)="toggleSubmenu('campañas')">
+            Campañas
+          </button>
+          <ul *ngIf="expandedMenu==='campañas'" class="list-group mt-1 ms-3">
+
+            <li class="list-group-item" (click)="selectSection('cadetes')">Campaña Cadetes</li>
+            <li class="list-group-item" (click)="selectSection('suboficial')">Campaña Suboficial</li>
+            <li class="list-group-item" (click)="selectSection('profesional')">Campaña Profesional</li>
+          </ul>
+        </li>
+
+        <li class="list-group-item">
+          <button class="btn w-100 text-start" (click)="selectSection('otras')">
+            Otras Configuraciones
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <div class="content flex-grow-1">
+      <div *ngIf="selectedSection==='cadetes'">
+        <h4>Configuración Campaña Cadetes</h4>
+        <form>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input id="nombre" class="form-control" [(ngModel)]="form.nombre" name="nombre">
+          </div>
+          <div class="mb-3">
+            <label for="fechaInicio" class="form-label">Fecha de inicio</label>
+            <input id="fechaInicio" type="date" class="form-control" [(ngModel)]="form.fechaInicio" name="fechaInicio">
+          </div>
+          <div class="mb-3">
+            <label for="fechaFin" class="form-label">Fecha de fin</label>
+            <input id="fechaFin" type="date" class="form-control" [(ngModel)]="form.fechaFin" name="fechaFin">
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+      </div>
+
+      <div *ngIf="selectedSection==='suboficial'">Formulario Campaña Suboficial</div>
+      <div *ngIf="selectedSection==='profesional'">Formulario Campaña Profesional</div>
+      <div *ngIf="selectedSection==='otras'">Formulario Otras Configuraciones</div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end border-top mt-3 pt-2">
+    <button class="btn btn-secondary" (click)="cerrar()">Cerrar</button>
+  </div>
+</div>
+

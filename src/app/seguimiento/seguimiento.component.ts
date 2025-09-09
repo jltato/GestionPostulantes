@@ -43,6 +43,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     estadoId: [],
     tipoInscripcionId: [''],
     sectorSolicitudId: [null],
+    campaniaId: [null],
   });
 
   ngOnInit(): void {
@@ -73,7 +74,8 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
       observacion: this.seguimiento.observaciones,
       estadoId: this.seguimiento.estadoId,
       tipoInscripcionId: this.seguimiento.tipoInscripcionId,
-      sectorSolicitudId: this.seguimiento.sectorSolicitudId
+      sectorSolicitudId: this.seguimiento.sectorSolicitudId,
+      campaniaId: this.seguimiento.campaniaId
     });
   }
 
@@ -84,6 +86,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
       observaciones: this.seguimientoFormGroup.value.observacion,
       tipoInscripcionId: this.seguimientoFormGroup.value.tipoInscripcionId,
       sectorSolicitudId: this.seguimientoFormGroup.value.sectorSolicitudId,
+      campaniaId: this.seguimientoFormGroup.value.campaniaId,
       estadoId: this.seguimientoFormGroup.value.estadoId,
       estadoSeguimientoActual: {
         etapaSeguimientoId: this.seguimientoFormGroup.value.etapaSeguimientoId,
@@ -114,6 +117,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
             estadoId: seguimiento.estadoId,
             tipoInscripcionId: seguimiento.tipoInscripcionId,
             sectorSolicitudId: seguimiento.sectorSolicitudId,
+            campaniaId: seguimiento.campaniaId,
         });
         this.guardando = false;
       },
@@ -156,6 +160,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
             estadoId: seguimiento.estadoId,
             tipoInscripcionId: seguimiento.tipoInscripcionId,
             sectorSolicitudId: seguimiento.sectorSolicitudId,
+            campaniaId: seguimiento.campaniaId
           });
           this.guardando = false;
         },
@@ -188,5 +193,10 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   });
   }
 
+ get campaniasFiltradas() {
+  return this.formData.campaniasActivas.filter(
+    (    c: { tipoInscripcionId: number; }) => c.tipoInscripcionId === this.tipo
+  );
+}
 
 }

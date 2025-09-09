@@ -68,3 +68,7 @@ form.formulario .col-xl-4 {
   background-color: #dc3545 !important;
   color: white;
 }
+
+.custom-dialog-container .mdc-dialog__surface {
+  border-radius: 0 !important;
+}

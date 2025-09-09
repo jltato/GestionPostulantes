@@ -3,33 +3,28 @@ import {
   AfterViewInit,
   Component,
   inject,
-  OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { Config } from 'datatables.net';
-import { DataTablesModule, DataTableDirective } from 'angular-datatables';
 import { environment } from '../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import 'datatables.net-buttons-dt';
 import 'datatables.net-responsive-dt';
 import { PostulanteService } from '../Services/postulante.service';
+import { ESTADOS_POSTULANTE } from '../shared/enums/estados-postulantes';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, DataTablesModule],
+  imports: [CommonModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css',
 })
-export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(DataTableDirective, { static: false })
-  dtElement!: DataTableDirective;
+export class ListComponent implements OnInit, AfterViewInit {
 
-  dtTrigger: Subject<any> = new Subject<any>();
-
+  estados = ESTADOS_POSTULANTE
   storageKey = 'DataTables_postulantes_listado';
 
   private route = inject(ActivatedRoute);
@@ -38,42 +33,21 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
   estadoId!: number;
   private tipoPostulanteId = 1;
   dtOptions: Config = {};
-  private postulanteService = inject(PostulanteService)
-
-
+  private postulanteService = inject(PostulanteService);
+  title = "";
   private baseUrl = environment.apiUrl;
   private apiKey =
     'gRnMxbEdZjkVr9m9jc18o4DcLu9CbD202KmzVp0m0LN-YPlZXUvXKgmp2GrJd9o6F1NfUFUKIyyGzh9LJ56G1LFZsJClNkbJjf-iCHhvLj1kO8oDaLKaS2pvtu1IcgsgFgqDuT4B0TieOpn8GEJuiUIM-VXUMvCR0JdsH9vWDr2KjewWqfCsQbnudLP2sUwz0vAWpLNaDPpFbXeq3V-xO7W1qlO9ETHtnoBBUHyrQQPIIiE4Ywc4oDsFkANjSxT9';
   filteredIds: number[] = [];
 
+
   ngOnInit(): void {
     this.tipo = this.route.snapshot.paramMap.get('tipo')!;
     this.estadoId = Number(this.route.snapshot.queryParamMap.get('est') ?? '1');
     this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
+    this.cargaTitulo(this.tipo, this.estadoId);
 
-
-    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
-      ([params, queryParams]) => {
-        const nuevoTipo = params.get('tipo')!;
-        const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
-        this.tipo = nuevoTipo;
-        this.estadoId = nuevoEstadoId;
-        this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
-
-         // Ocultar o mostrar columna "Sector"
-        this.dtElement.dtInstance.then((dtInstance) => {
-          const mostrar = this.tipoPostulanteId === 3;
-          dtInstance.column(7).visible(mostrar); // columna "Sector"
-        });
-
-        this.dtElement.dtInstance.then((dtInstance) => {
-          const mostrar = this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3 ;
-          dtInstance.column(6).visible(mostrar); // columna "Establecimiento"
-        });
-
-        this.rerender();
-      },
-    );
+    this.storageKey = `DataTables_${this.router.url}`;
 
     const windowHeight: number = $(window).height() ?? 600;
     const tabla = $('#laTabla');
@@ -135,8 +109,9 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'Nombres', data: 'nombre' },
         { title: 'Sexo', data: 'sexo' },
         { title: 'DNI', data: 'dni' },
-        { title: 'Establecimiento', data: 'estabSolicitud', visible:(this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3) },
-        { title: 'Sector', data: 'nombreSector', visible:this.tipoPostulanteId === 3},
+        { title: 'Establecimiento', data: 'estabSolicitud' },
+        { title: 'Sector', data: 'nombreSector'},
+        { title: 'Campaña', data: 'nombreCampania'},
         { title: 'Estado', data: 'estadoNombre'  },
         {
           title: 'Fecha',
@@ -206,48 +181,73 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return data ? JSON.parse(data) : null;
       },
     };
+
   }
 
-  ngAfterViewInit(): void {
-  this.dtTrigger.next(null);
-
-  combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
-    ([params, queryParams]) => {
-      const nuevoTipo = params.get('tipo')!;
-      const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
-      this.tipo = nuevoTipo;
-      this.estadoId = nuevoEstadoId;
-      this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
-
-      this.dtElement.dtInstance.then((dtInstance) => {
-        dtInstance.column(7).visible(this.tipoPostulanteId === 3); // Sector
-        dtInstance.column(6).visible(this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3 ); // Establecimiento
-      });
-
-      this.rerender();
+  cargaTitulo(tipo:string, estado:number) : void
+    {
+      const estadoActual = ESTADOS_POSTULANTE.find(e => e.value === estado);
+      const label = estadoActual ? estadoActual.label : "Desconocido";
+      this.title = tipo + " (" + label + ")";
     }
-  );
-}
 
-  ngOnDestroy(): void {
-    this.dtTrigger.unsubscribe();
+
+private initTable(): void {
+  if (!$.fn.DataTable.isDataTable('#laTabla')) {
+    $('#laTabla').DataTable(this.dtOptions);
   }
+}
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      const tableExists = $.fn.DataTable.isDataTable('#laTabla');
+
+      combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
+        ([params, queryParams]) => {
+          const nuevoTipo = params.get('tipo')!;
+          const nuevoEstadoId = Number(queryParams.get('est') ?? '1');
+          const nuevoStorageKey = `DataTables_${nuevoTipo}_${nuevoEstadoId}`;
+
+          const cambiarConfiguracion = nuevoStorageKey !== this.storageKey;
+
+          this.tipo = nuevoTipo;
+          this.estadoId = nuevoEstadoId;
+          this.tipoPostulanteId = this.tipoANumero(nuevoTipo.toLowerCase());
+          this.storageKey = nuevoStorageKey;
+
+          this.cargaTitulo(this.tipo, this.estadoId);
+
+          if (tableExists && cambiarConfiguracion) {
+            const table = $('#laTabla').DataTable();
+            table.destroy();
+          }
+
+          this.dtOptions.stateLoadCallback = () => {
+            const data = sessionStorage.getItem(this.storageKey);
+            return data ? JSON.parse(data) : null;
+          };
+
+          if (!tableExists || cambiarConfiguracion) {
+            this.initTable();
+          }
+
+          const table = $('#laTabla').DataTable();
+          table.column(7).visible(this.tipoPostulanteId === 3);
+          table.column(6).visible(this.tipoPostulanteId === 2 || this.tipoPostulanteId === 3);
+          this.rerender();
+        }
+      );
+    });
+  }
+
+
 
   rerender(): void {
-    if (!this.dtElement) {
-      console.warn('dtElement no está definido aún.');
+    const table = $('#laTabla').DataTable();
+    if (!table) {
+      console.warn('DataTable no inicializado.');
       return;
     }
-
-    this.dtElement.dtInstance.then((dtInstance) => {
-      // Destroy the table first
-      //dtInstance.destroy();
-      // Call the dtTrigger to rerender again
-      //this.dtTrigger.next(null);
-       dtInstance.clear();
-       dtInstance.draw(false);
-      this.resetearEstadoDataTable();
-    });
+    table.ajax.reload(undefined, false);
   }
 
   resetearEstadoDataTable() {

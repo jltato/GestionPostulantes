@@ -154,6 +154,8 @@
             <div class="col-12 col-xl-5 ">
               <div class="d-xl-flex justify-content-around gap-2">
 
+
+
                 <div class="col">
                   <label for="etapa" class="form-label">Postulante a:</label>
                   <select
@@ -203,6 +205,21 @@
                   </select>
                 </div>
               </div>
+              <div class="col-md">
+                  <label for="etapa" class="form-label">Campaña:</label>
+                  <select
+                    id="campania"
+                    class="form-select"
+                    formControlName="campaniaId"
+                  >
+                    <option
+                      *ngFor="let campania of campaniasFiltradas"
+                      [value]="campania.campaniaId"
+                    >
+                      {{ campania.nombre }}
+                    </option>
+                  </select>
+                </div>
               <hr>
               <div class="mb-3">
                 <label for="observaciones" class="form-label"
