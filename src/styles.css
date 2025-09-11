@@ -71,4 +71,5 @@ form.formulario .col-xl-4 {
 
 .custom-dialog-container .mdc-dialog__surface {
   border-radius: 0 !important;
+  min-width: 700px;
 }

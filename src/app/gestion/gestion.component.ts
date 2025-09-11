@@ -24,6 +24,7 @@ import { ContactoComponent } from './contactos/contactos.component';
 import { EstudiosComponent } from "./estudios/estudios.component";
 import { TrabajosComponent } from "./trabajos/trabajos.component";
 import { FamiliarComponent } from "./familia/familia.component";
+import { AlertService } from '../Services/alert.service';
 
 @Component({
   selector: 'app-gestion',
@@ -52,8 +53,9 @@ import { FamiliarComponent } from "./familia/familia.component";
 export class GestionComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-   private _formBuilder = inject(FormBuilder);
+  private _formBuilder = inject(FormBuilder);
   private postulanteService = inject(PostulanteService);
+  private alert = inject(AlertService);
 
   postulante: any;
   imagenUrl: any;
@@ -415,13 +417,13 @@ export class GestionComponent implements OnInit {
         this.cargarPostulante(res);
         this.guardando = false;
         this.habilitado=false;
-
+        this.alert.alert('Guardado', 'La modificacion se ha guardado exitosamente!')
         this.InicialFormGroup.disable();
 
 
       },
       error: (err) => {
-        alert("ha ocurrido un error al guardar los datos, por favor intente nuevamente")
+        this.alert.alert("Error!","ha ocurrido un error al guardar los datos, por favor intente nuevamente!")
         console.error('Error al actualizar', err);
         this.guardando=false
       }

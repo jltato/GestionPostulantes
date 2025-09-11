@@ -192,15 +192,15 @@ export class ListComponent implements OnInit, AfterViewInit {
     }
 
 
-private initTable(): void {
-  if (!$.fn.DataTable.isDataTable('#laTabla')) {
-    $('#laTabla').DataTable(this.dtOptions);
+  private initTable(): void {
+    if (!$.fn.DataTable.isDataTable('#laTabla')) {
+      $('#laTabla').DataTable(this.dtOptions);
+    }
   }
-}
+
   ngAfterViewInit(): void {
     setTimeout(() => {
       const tableExists = $.fn.DataTable.isDataTable('#laTabla');
-
       combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
         ([params, queryParams]) => {
           const nuevoTipo = params.get('tipo')!;
@@ -217,8 +217,7 @@ private initTable(): void {
           this.cargaTitulo(this.tipo, this.estadoId);
 
           if (tableExists && cambiarConfiguracion) {
-            const table = $('#laTabla').DataTable();
-            table.destroy();
+            $('#laTabla').DataTable().clear().destroy(true);
           }
 
           this.dtOptions.stateLoadCallback = () => {
@@ -238,8 +237,6 @@ private initTable(): void {
       );
     });
   }
-
-
 
   rerender(): void {
     const table = $('#laTabla').DataTable();
@@ -300,7 +297,6 @@ private initTable(): void {
         }
       });
   }
-
 }
 
 

@@ -6,11 +6,12 @@ import { PostulanteService } from '../Services/postulante.service';
 import { MatIcon } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { AlertService } from '../Services/alert.service';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-seguimiento',
   standalone : true,
-  imports: [CommonModule, MatIcon, ReactiveFormsModule],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule, MatButtonToggleModule],
   templateUrl: './seguimiento.component.html',
   styleUrl: './seguimiento.component.css'
 })
@@ -18,6 +19,8 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
 
   @Input() seguimiento: any;
   @Input() formData: any;
+
+    // en la clase del componente
 
   private alert = inject(AlertService)
   private _formBuilder = inject(FormBuilder);
@@ -119,6 +122,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
             sectorSolicitudId: seguimiento.sectorSolicitudId,
             campaniaId: seguimiento.campaniaId,
         });
+        this.alert.alert("Guardado", "Los cambios se guardaron exitosamente!")
         this.guardando = false;
       },
       error: (err:any) => {
@@ -131,7 +135,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
 
   onEtapaChange() {
     this.seguimientoFormGroup.get('fechaTurno')?.setValue('');
-    this.seguimientoFormGroup.get('asistencia')?.setValue(false);
+    this.seguimientoFormGroup.get('asistencia')?.setValue(null);
     this.seguimientoFormGroup.get('apto')?.setValue(null);
     this.seguimientoFormGroup.get('notificado')?.setValue(false);
   }
@@ -197,6 +201,19 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   return this.formData.campaniasActivas.filter(
     (    c: { tipoInscripcionId: number; }) => c.tipoInscripcionId === this.tipo
   );
+}
+
+toggleAsistencia(valor: boolean): void {
+  const control = this.seguimientoFormGroup.get('asistencia');
+  if (!control) return;
+
+  if (control.value === valor) {
+    // mismo valor → desmarcar (null)
+    control.setValue(null);
+  } else {
+    // valor nuevo → asignar
+    control.setValue(valor);
+  }
 }
 
 }

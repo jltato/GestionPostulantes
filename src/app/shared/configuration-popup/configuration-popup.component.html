@@ -1,27 +1,27 @@
-<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
-<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
 
-<div class="p-3">
+<div class="p-3 h-100">
   <div class="d-flex justify-content-end">
     <button class="btn-close" (click)="cerrar()"> </button>
   </div>
+  <h2 class="text-center mb-4">Configuraciones Generales</h2>
 
-  <div class="popup d-flex">
+  <div class="popup d-flex h-100">
     <!-- Menu lateral -->
-    <div class="menu flex-shrink-0 me-3" style="width: 250px;">
+    <div class="menu flex-shrink-0 me-3" style="width: 220px;">
       <ul class="list-group">
         <li class="list-group-item">
           <button class="btn w-100 text-start" (click)="toggleSubmenu('campañas')">
             Campañas
           </button>
-          <ul *ngIf="expandedMenu==='campañas'" class="list-group mt-1 ms-3">
-
-            <li class="list-group-item" (click)="selectSection('cadetes')">Campaña Cadetes</li>
-            <li class="list-group-item" (click)="selectSection('suboficial')">Campaña Suboficial</li>
-            <li class="list-group-item" (click)="selectSection('profesional')">Campaña Profesional</li>
+          @if(expandedMenu==='campañas'){
+            <ul class="list-group mt-1 ms-3">
+              <li class="list-group-item border-0"><button class="btn btn-sm m-0 p-0 text-start w-100" (click)="selectSection('cadetes')"> Campaña Cadetes</button></li>
+              <li class="list-group-item border-0"><button class="btn btn-sm m-0 p-0 text-start w-100" (click)="selectSection('suboficial')"> Campaña Suboficial</button> </li>
+              <li class="list-group-item border-0"><button class="btn btn-sm m-0 p-0 text-start w-100" (click)="selectSection('profesional')"> Campaña Profesional</button></li>
+              <li class="list-group-item border-0"><button class="btn btn-sm m-0 p-0 text-start w-100" (click)="selectSection('listadoCampañas')"> Historial Campañas</button></li>
           </ul>
+          }
         </li>
-
         <li class="list-group-item">
           <button class="btn w-100 text-start" (click)="selectSection('otras')">
             Otras Configuraciones
@@ -32,33 +32,131 @@
 
     <!-- Contenido dinámico -->
     <div class="content flex-grow-1">
-      <div *ngIf="selectedSection==='cadetes'">
-        <h4>Configuración Campaña Cadetes</h4>
-        <form>
+      @if (selectedSection === 'cadetes' || selectedSection === 'suboficial' || selectedSection === 'profesional'){
+        <div>
+        <h4>Nueva Campaña {{ selectedSection | titlecase }}</h4>
+        <form  [formGroup]="campaniaForm" (ngSubmit)="onSubmit()">
+          <input type="hidden" formControlName="tipoInscripcionId">
+          <input type="hidden" formControlName="campaniaId">
           <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input id="nombre" class="form-control" [(ngModel)]="form.nombre" name="nombre">
+            <input id="nombre" class="form-control text-center" formControlName="nombre">
           </div>
           <div class="mb-3">
             <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-            <input id="fechaInicio" type="date" class="form-control" [(ngModel)]="form.fechaInicio" name="fechaInicio">
+            <input id="fechaInicio" type="datetime-local" class="form-control text-center" formControlName="fechaDesde">
           </div>
           <div class="mb-3">
             <label for="fechaFin" class="form-label">Fecha de fin</label>
-            <input id="fechaFin" type="date" class="form-control" [(ngModel)]="form.fechaFin" name="fechaFin">
+            <input id="fechaFin" type="datetime-local" class="form-control text-center" formControlName="fechaHasta">
           </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary" [disabled]="guardando">Guardar</button>
+            </div>
+          @if (guardando)
+          {
+             <div class="d-flex justify-content-center mt-5">
+              <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+            </div>
+          }
         </form>
       </div>
+      }
+      <!-- LISTADO DE TODAS LAS CAMPAÑAS -->
+      @if(selectedSection === 'listadoCampañas'){
+        <div>
+          <div class="text-center">
+            <p class="fs-4">Historial de Campañas</p>
+          </div>
+          @if(!guardando){
+             <table class="table border-row table hover table-light table-striped compact tabla-chica"  style="font-size: x-small;">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Desde</th>
+                <th>Hasta</th>
+                <th>Activo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (campania of campanias; track $index) {
+              <tr
+              (click)="getCampania(campania.campaniaId)"
+              style="cursor: pointer;">
+                <td>{{ campania.nombre }}</td>
+                <td>{{ campania.tipoInscripcion.tipoInscripcionNombre }}</td>
+                <td>{{ campania.fechaDesde | date:'dd/MM/yyyy' }}</td>
+                <td>{{ campania.fechaHasta | date:'dd/MM/yyyy' }}</td>
+                <td>{{ campania.activo ? 'Sí' : 'No' }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+          }
+          @if(guardando){
+            <div class="d-flex justify-content-center mt-5">
+              <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+            </div>
 
-      <div *ngIf="selectedSection==='suboficial'">Formulario Campaña Suboficial</div>
-      <div *ngIf="selectedSection==='profesional'">Formulario Campaña Profesional</div>
-      <div *ngIf="selectedSection==='otras'">Formulario Otras Configuraciones</div>
+          }
+        </div>
+      }
+      <!-- FORMULARIO DE MODIFICACION DE CAMPAÑA -->
+      @if(selectedSection === 'modifCampania'){
+        <form [formGroup]="editCampaniaForm" (ngSubmit)="onSubmitEdit()" class="p-3">
+            <input type="hidden" class="form-control" formControlName="campaniaId" readonly />
+
+          <div class="mb-3">
+            <label for="" class="form-label">Nombre</label>
+            <input type="text" class="form-control text-center" formControlName="nombre" />
+          </div>
+
+          <div class="mb-3">
+            <label for="" class="form-label">Fecha Desde</label>
+            <input type="datetime-local" class="form-control text-center" formControlName="fechaDesde" />
+          </div>
+
+          <div class="mb-3">
+            <label for="" class="form-label">Fecha Hasta</label>
+            <input type="datetime-local" class="form-control text-center" formControlName="fechaHasta" />
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" formControlName="activo" />
+            <label for="" class="form-check-label">Activo</label>
+          </div>
+           @if (guardando)
+          {
+             <div class="d-flex justify-content-center mt-5">
+              <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+            </div>
+          }
+          @if(!guardando)
+          {
+          <div class="d-flex justify-content-around">
+            <button type="button" class="btn btn-danger" [disabled]="guardando" (click)="eliminarCamapania(editCampaniaForm.value.campaniaId)">
+              Eliminar Campaña
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando">
+              Guardar cambios
+            </button>
+          </div>
+        }
+        </form>
+      }
+
+      <!-- OTRAS CONFIGURACIONES -->
+      @if(selectedSection === 'otras'){
+        <div>Otras Configuraciones</div>
+      }
+      @else {
+        <div></div>
+      }
+
     </div>
   </div>
 
-  <div class="d-flex justify-content-end border-top mt-3 pt-2">
-    <button class="btn btn-secondary" (click)="cerrar()">Cerrar</button>
-  </div>
+
 </div>
 

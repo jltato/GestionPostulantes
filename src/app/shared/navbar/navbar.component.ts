@@ -38,8 +38,8 @@ export class NavbarComponent {
 
   abrirConfiguracion() {
   const dialogRef = this.dialog.open(ConfigurationPopupComponent, {
-    width: '1000px',
-    data: { /* datos iniciales si necesitás */ },
+    width: '1400px',
+    height: '600px',
     panelClass: 'custom-dialog-container'
   });
 

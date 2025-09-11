@@ -34,6 +34,7 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/jszip/dist/jszip.min.js",
               "node_modules/datatables.net/js/dataTables.min.js",
               "node_modules/datatables.net-dt/js/dataTables.dataTables.min.js",
@@ -65,7 +66,12 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+                "optimization": true,
+                "aot": true,
+                "sourceMap": false,
+                "namedChunks": false,
+                "extractLicenses": true
             },
            "development": {
               "outputPath": "dist/gestion-postulantes-dev",
