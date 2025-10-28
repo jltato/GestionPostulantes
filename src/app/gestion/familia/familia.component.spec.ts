@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FamiliaComponent } from './familia.component';
+import { FamiliarComponent } from './familia.component';
 
 describe('FamiliaComponent', () => {
-  let component: FamiliaComponent;
-  let fixture: ComponentFixture<FamiliaComponent>;
+  let component: FamiliarComponent;
+  let fixture: ComponentFixture<FamiliarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FamiliaComponent]
+      imports: [FamiliarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FamiliaComponent);
+    fixture = TestBed.createComponent(FamiliarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
