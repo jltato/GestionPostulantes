@@ -72,15 +72,27 @@
           class="formulario"
           *ngIf="postulante && formData"
         >
+
+        @if(cargando){
+          <div class="d-flex justify-content-center align-items-center h-100">
+              <mat-spinner diameter="50" ></mat-spinner>
+          </div>
+          
+        }
+        @if(!cargando)
+        {
           <fieldset class="border p-1 rounded mb-3 row g-2 mt-0">
-            <legend class="float-none w-auto px-3">DATOS PERSONALES</legend>
+            <legend class="float-none w-auto px-3 d-flex">DATOS PERSONALES </legend>
             <!-- Alertas -->
-            <div class="text-danger">
-              <p *ngIf="antecedentes"> *El DNI del postulante se encuentra en la base de datos de internos.</p>
-              <p *ngIf="visitante"> *El DNI del postulante se encuentra en la base de datos de visitantes.</p>
-              <p *ngIf="famAntecedente"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de internos.</p>
-              <p *ngIf="famVisitante"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de visitantes.</p>
-            </div>
+             
+                <div class="text-danger">
+                  <p *ngIf="antecedentes"> *El DNI del postulante se encuentra en la base de datos de internos.</p>
+                  <p *ngIf="visitante"> *El DNI del postulante se encuentra en la base de datos de visitantes.</p>
+                  <p *ngIf="famAntecedente"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de internos.</p>
+                  <p *ngIf="famVisitante"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de visitantes.</p>
+                </div>
+             
+            
               <!-- Apellido -->
             <div class="col-12 col-md-4 col-xl-2 form-floating">
               <label class="form-label small">Apellido</label>
@@ -383,6 +395,7 @@
             </button>
             <button *ngIf="!habilitado" [disabled]="guardando"  type="button" class="btn btn-secondary" (click)="habilitar()">Modificar</button>
           </div>
+        }
         </form>
       </div>
     </div>

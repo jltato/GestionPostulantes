@@ -77,6 +77,7 @@ export class GestionComponent implements OnInit {
   habilitado=false;
   guardando = false;
   postulanteId=0;
+  cargando = false;
 
 
   //////////////////////////////////////// FORMULARIOS //////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +111,7 @@ export class GestionComponent implements OnInit {
     codigoPostal: ['', Validators.required],
     observaciones: [''],
   });
+    
 
 
 
@@ -137,7 +139,12 @@ export class GestionComponent implements OnInit {
   }
 
   cargarPostulante(id: number): void {
+    this.cargando = true
     this.fotoLista = false;
+    this.antecedentes = false;
+    this.visitante = false;
+    this.famAntecedente = false
+    this.famVisitante = false;
     this.postulanteService.getPostulante(id.toString()).subscribe({
       next: (postulante) => {
         this.InicialFormGroup.disable();
@@ -150,12 +157,14 @@ export class GestionComponent implements OnInit {
         this.getIMC(altura, peso)
         this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
           next: (verificado)=>{
+            this.cargando = false;
             this.antecedentes = verificado[0].exInterno;
             this.visitante = verificado[0].visitante;
           }
         });
         this.postulanteService.getFamiliares(postulante.postulanteId).subscribe({
            next: (Familiares)=>{
+            this.cargando = false;
             this.Familiares = Familiares;
             this.famVisitante = false;
             this.famAntecedente = false;

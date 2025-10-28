@@ -38,6 +38,20 @@
   </div>
 
   <span class="spacer"></span>
+    
+  @if (isAuthenticated$ | async) {
+    <span class="text-light ms-3 fs-6">Hola {{ userName }}!</span>
+    <button mat-button class="text-light" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Cerrar Sesión
+    </button>
+  } @else {
+    <button mat-button class="text-light" (click)="login()">
+      <mat-icon>login</mat-icon>
+      Iniciar Sesión
+    </button>
+  }
+
   <button mat-button class="text-light" [matMenuTriggerFor]="menu">Menu</button>
   <mat-menu #menu="matMenu">
     @for (estado of estados; track $index) {
@@ -48,7 +62,11 @@
       </button>
    }
   </mat-menu>
+
+  
   <span><mat-icon (click)="abrirConfiguracion()" matTooltip="Configuraciones">settings</mat-icon></span>
+
+
 </mat-toolbar>
 
 

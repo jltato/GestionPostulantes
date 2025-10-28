@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -8,22 +8,80 @@ import { ConfigurationPopupComponent } from '../configuration-popup/configuratio
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule} from '@angular/material/tooltip';
 import { ESTADOS_POSTULANTE } from '../enums/estados-postulantes';
+import { AuthServiceService } from '../../Services/auth-service.service';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [MatToolbarModule, MatButtonModule, RouterModule, MatMenuModule, MatIconModule, MatDialogModule, MatTooltipModule],
+  imports: [MatToolbarModule, MatButtonModule, RouterModule, MatMenuModule, MatIconModule, MatDialogModule, MatTooltipModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+  isAuthenticated$!: Observable<boolean>;
+  userName = 'USUARIO';
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private dialog: MatDialog,
+    private authService: AuthServiceService,
+    private oidcSecurityService: OidcSecurityService
   ) {}
 
   estados = ESTADOS_POSTULANTE;
+
+  ngOnInit(): void {
+    // Verificar autenticación en TODAS las rutas excepto los callbacks
+    if (!window.location.pathname.includes('auth-callback') && 
+        !window.location.pathname.includes('logout-callback')) {
+      this.oidcSecurityService.checkAuth().subscribe();
+    }
+    
+    this.isAuthenticated$ = this.oidcSecurityService.isAuthenticated$.pipe(
+      map(({ isAuthenticated }) => isAuthenticated)
+    );
+   
+    this.loadUserName();
+    
+    // Actualizar cuando cambie la autenticación
+    this.isAuthenticated$.subscribe((isAuth) => {
+      if (isAuth) {
+        // Pequeno delay para asegurar que userData este en sessionStorage
+        setTimeout(() => this.loadUserName(), 100);
+      } else {
+        this.userName = 'USUARIO';
+      }
+    });
+  }
+
+  loadUserName(): void {
+    const storageStr = sessionStorage.getItem('0-Postulantes');
+    
+    if (storageStr) {
+      try {
+        const storage = JSON.parse(storageStr);
+        const userData = storage.userData;
+        
+        if (userData) {
+          const fullName = `${userData.given_name || ''} ${userData.family_name || ''}`.trim();
+          this.userName = fullName ? fullName.toUpperCase() : 'USUARIO';
+        } else {
+          this.userName = 'USUARIO';
+        }
+      } catch {
+        this.userName = 'USUARIO';
+      }
+    } else {
+      this.userName = 'USUARIO';
+    }
+  }
+  
+  
 
 
 
@@ -37,15 +95,23 @@ export class NavbarComponent {
 
 
   abrirConfiguracion() {
-  const dialogRef = this.dialog.open(ConfigurationPopupComponent, {
-    width: '1400px',
-    height: '600px',
-    panelClass: 'custom-dialog-container'
-  });
+    const dialogRef = this.dialog.open(ConfigurationPopupComponent, {
+      width: '1400px',
+      height: '600px',
+      panelClass: 'custom-dialog-container'
+    });
 
-  // Esto escucha cuando el popup se cierra
-  dialogRef.afterClosed().subscribe(result => {
-    console.log('El popup se cerró, valor devuelto:', result);
-  });
-}
+    // Esto escucha cuando el popup se cierra
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('El popup se cerró, valor devuelto:', result);
+    });
+  }
+
+  login() {
+    this.authService.login();
+  }
+
+  logout() {
+    this.authService.logout();
+  }
 }
