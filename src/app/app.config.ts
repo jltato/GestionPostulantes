@@ -28,7 +28,8 @@ export const appConfig: ApplicationConfig = {
           silentRenew: true,
           autoCleanStateAfterAuthentication: true,
           logLevel: LogLevel.Debug,
-          secureRoutes: []
+          secureRoutes: [],
+          maxIdTokenIatOffsetAllowedInSeconds: 300
         },
       })
     ),
