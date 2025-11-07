@@ -20,17 +20,40 @@ export class AuthCallbackComponent implements OnInit {
       next: (result) => {
         if (result.isAuthenticated) {
           console.log('Usuario autenticado:', result.userData);
-          // Redirigir a la página principal o la ruta guardada
+          
+          // Verificar si el usuario está autorizado para esta aplicación
+          const appAuthorized = result.userData?.app_authorized;
+          
+          if (appAuthorized === false || appAuthorized === 'false') {
+            // Usuario autenticado pero no autorizado para esta aplicación
+            sessionStorage.setItem('app_unauthorized', 'true');
+            this.router.navigate(['/unauthorized']);
+            return;
+          }
+          
+          // Usuario autenticado y autorizado
+          sessionStorage.removeItem('app_unauthorized');
           const returnUrl = sessionStorage.getItem('returnUrl') || '/home';
           sessionStorage.removeItem('returnUrl');
           this.router.navigateByUrl(returnUrl);
-        } else {
-          console.warn('Autenticación fallida');
+        }         
+        else if (!result.isAuthenticated) {
+          console.log(result.errorMessage?.toString());
+        }
+        else 
+         {console.warn('Autenticación fallida');
           this.router.navigate(['/home']);
         }
       },
       error: (err: any) => {
-        console.error('Error procesando callback de autenticación:', err);
+        // Detectar error específico de desincronización de reloj
+        const errorStr = err?.toString() || '';
+        if (errorStr.includes('iat rejected') && errorStr.includes('id_token was issued too far away from the current time')) {
+          console.error('Error de autenticación: El reloj del sistema está desincronizado.',
+            'Por favor, sincronice el reloj del sistema con un servidor NTP.');
+        } else {
+          console.error('Error procesando callback de autenticación:', err);
+        }
         this.router.navigate(['/home']);
       }
     });
