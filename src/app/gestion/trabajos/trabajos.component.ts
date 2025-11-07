@@ -15,6 +15,7 @@ export class TrabajosComponent {
 @Input() trabajos: Trabajo[] = [];
 @Input() postulanteId = 0;
 @Input() habilitado = false;
+@Input() isReadOnly = false;
 @Output() trabajosChange = new EventEmitter<Trabajo[]>();
 
   fb = inject(FormBuilder);

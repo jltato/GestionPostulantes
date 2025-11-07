@@ -5,6 +5,7 @@
     <button
       class="btn btn-sm btn border-0 ms-auto"
       *ngIf="habilitado"
+      [disabled]="isReadOnly"
       (click)="toggleForm()"
       type="button"
     >
@@ -33,12 +34,14 @@
         <td *ngIf="habilitado" class="d-flex justify-content-center gap-2">
           <button
             class="btn btn-primary btn-sm me-1"
+            [disabled]="isReadOnly"
             (click)="editarEstudio(estudio.estudiosId)"
           >
             Editar
           </button>
           <button
             class="btn btn-danger btn-sm"
+            [disabled]="isReadOnly"
             (click)="eliminarEstudio(estudio.estudiosId)"
           >
             Eliminar
@@ -106,10 +109,10 @@
     </div>
 
     <div class="col-md-3 d-flex gap-2 justify-content-center">
-      <button type="submit" class="btn btn-success btn-sm">
+      <button type="submit" class="btn btn-success btn-sm" [disabled]="isReadOnly">
         {{ editIndex !== null ? 'Actualizar' : 'Guardar' }}
       </button>
-      <button type="button" class="btn btn-danger btn-sm" (click)="toggleForm()">
+      <button type="button" class="btn btn-danger btn-sm" [disabled]="isReadOnly" (click)="toggleForm()">
         Cancelar
       </button>
     </div>

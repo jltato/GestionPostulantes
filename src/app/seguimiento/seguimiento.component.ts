@@ -19,6 +19,8 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
 
   @Input() seguimiento: any;
   @Input() formData: any;
+  @Input() isReadOnly = false;
+  @Input() isReconocimientosMedicos = false;
 
     // en la clase del componente
 
@@ -60,6 +62,11 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     if (changes['seguimiento'] && changes['seguimiento'].currentValue) {
       this.setearFormulario();
     }
+    
+    // Manejar permisos según el rol
+    if (changes['isReadOnly'] || changes['isReconocimientosMedicos']) {
+      this.aplicarPermisos();
+    }
   }
 
   setearFormulario() {
@@ -80,23 +87,43 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
       sectorSolicitudId: this.seguimiento.sectorSolicitudId,
       campaniaId: this.seguimiento.campaniaId
     });
+    this.aplicarPermisos();
+  }
+
+  aplicarPermisos() {
+    if (this.isReadOnly) {
+      // Solo lectura: deshabilitar todo
+      this.seguimientoFormGroup.disable();
+    } else if (this.isReconocimientosMedicos) {
+      // Reconocimientos Médicos: deshabilitar todo excepto campos específicos
+      this.seguimientoFormGroup.disable();
+      this.seguimientoFormGroup.get('asistencia')?.enable();
+      this.seguimientoFormGroup.get('apto')?.enable();
+      this.seguimientoFormGroup.get('notificado')?.enable();
+      this.seguimientoFormGroup.get('observacion')?.enable();
+    } else {
+      // Acceso completo: habilitar todo
+      this.seguimientoFormGroup.enable();
+    }
   }
 
    enviarSeguimiento() {
     this.guardando = true;
+    // Usar getRawValue() para incluir campos deshabilitados
+    const formValues = this.seguimientoFormGroup.getRawValue();
     const seguimientoPayload = {
       seguimientoId: this.seguimientoId,
-      observaciones: this.seguimientoFormGroup.value.observacion,
-      tipoInscripcionId: this.seguimientoFormGroup.value.tipoInscripcionId,
-      sectorSolicitudId: this.seguimientoFormGroup.value.sectorSolicitudId,
-      campaniaId: this.seguimientoFormGroup.value.campaniaId,
-      estadoId: this.seguimientoFormGroup.value.estadoId,
+      observaciones: formValues.observacion,
+      tipoInscripcionId: formValues.tipoInscripcionId,
+      sectorSolicitudId: formValues.sectorSolicitudId,
+      campaniaId: formValues.campaniaId,
+      estadoId: formValues.estadoId,
       estadoSeguimientoActual: {
-        etapaSeguimientoId: this.seguimientoFormGroup.value.etapaSeguimientoId,
-        fechaTurno: this.seguimientoFormGroup.value.fechaTurno,
-        asistencia: this.seguimientoFormGroup.value.asistencia,
-        apto: this.seguimientoFormGroup.value.apto,
-        notificado: this.seguimientoFormGroup.value.notificado,
+        etapaSeguimientoId: formValues.etapaSeguimientoId,
+        fechaTurno: formValues.fechaTurno,
+        asistencia: formValues.asistencia,
+        apto: formValues.apto,
+        notificado: formValues.notificado,
       },
     };
 
@@ -216,4 +243,7 @@ toggleAsistencia(valor: boolean): void {
   }
 }
 
+
+
 }
+

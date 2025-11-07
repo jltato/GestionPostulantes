@@ -15,6 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 export class ContactoComponent {
   @Input() contactos: Contacto[] = [];
   @Input() habilitado = false;
+  @Input() isReadOnly = false;
   @Input() postulanteId = 0;
   @Output() contactosChange = new EventEmitter<Contacto[]>();
 

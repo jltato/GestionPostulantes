@@ -4,6 +4,7 @@
 
     <button class="btn btn-sm btn border-0 ms-auto "
       *ngIf="habilitado"
+      [disabled]="isReadOnly"
       (click)="toggleForm()"
       type="button">
       <mat-icon *ngIf="!showForm" fontIcon="add"></mat-icon>
@@ -25,8 +26,8 @@
         <td>{{ contacto.telefono }}</td>
         <td>{{ contacto.perteneciente }}</td>
         <td *ngIf="habilitado" class="d-flex justify-content-center gap-2">
-          <button class="btn btn-primary btn-sm me-1" (click)="editarContacto(contacto.contactoId)">Editar</button>
-          <button class="btn btn-danger btn-sm" (click)="eliminarContacto(contacto.contactoId)">Eliminar</button>
+          <button class="btn btn-primary btn-sm me-1" [disabled]="isReadOnly" (click)="editarContacto(contacto.contactoId)">Editar</button>
+          <button class="btn btn-danger btn-sm" [disabled]="isReadOnly" (click)="eliminarContacto(contacto.contactoId)">Eliminar</button>
         </td>
       </tr>
     </tbody>
@@ -42,8 +43,8 @@
       <input class="form-control form-control-sm" formControlName="perteneciente" placeholder="Pertenece a" />
     </div>
      <div class="col-md-3 d-flex gap-2 justify-content-center">
-      <button type="submit" class="btn btn-success btn-sm">{{ editIndex !== null ? 'Actualizar' : 'Guardar' }}</button>
-      <button type ="button" class="btn btn-danger btn-sm" (click)="toggleForm()">cancelar</button>
+      <button type="submit" class="btn btn-success btn-sm" [disabled]="isReadOnly">{{ editIndex !== null ? 'Actualizar' : 'Guardar' }}</button>
+      <button type ="button" class="btn btn-danger btn-sm" [disabled]="isReadOnly" (click)="toggleForm()">cancelar</button>
     </div>
   </form>
 

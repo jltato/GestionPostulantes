@@ -16,6 +16,7 @@ export class FamiliarComponent implements OnInit {
   @Input() parentescos: parentesco[] = [];
   @Input() postulanteId!: number;
   @Input() habilitado = false;
+  @Input() isReadOnly = false;
 
   @Output() familiaresChange = new EventEmitter<Familiar[]>();
 

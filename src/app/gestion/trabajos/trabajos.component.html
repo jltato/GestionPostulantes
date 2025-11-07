@@ -5,6 +5,7 @@
     <button
         class="btn btn-sm btn border-0 ms-auto"
         *ngIf="habilitado"
+        [disabled]="isReadOnly"
         (click)="toggleForm()"
         type="button"
     >
@@ -37,10 +38,10 @@
         <td>{{ trabajo.otraFuerza ? 'Sí' : 'No' }}</td>
         <td>{{ trabajo.motivoBaja || '-' }}</td>
         <td *ngIf="habilitado">
-          <button class="btn btn-sm btn-primary me-1" (click)="editarTrabajo(trabajo.trabajoId)">
+          <button class="btn btn-sm btn-primary me-1" [disabled]="isReadOnly" (click)="editarTrabajo(trabajo.trabajoId)">
             Editar
           </button>
-          <button class="btn btn-sm btn-danger" (click)="eliminarTrabajo(trabajo.trabajoId)">
+          <button class="btn btn-sm btn-danger" [disabled]="isReadOnly" (click)="eliminarTrabajo(trabajo.trabajoId)">
             Eliminar
           </button>
         </td>
@@ -120,10 +121,10 @@
     </div>
 
     <div class="col-md-3 d-flex gap-2 justify-content-center">
-      <button type="submit" class="btn btn-success btn-sm">
+      <button type="submit" class="btn btn-success btn-sm" [disabled]="isReadOnly">
         {{ editIndex !== null ? 'Actualizar' : 'Guardar' }}
       </button>
-      <button type="button" class="btn btn-danger btn-sm" (click)="toggleForm()">
+      <button type="button" class="btn btn-danger btn-sm" [disabled]="isReadOnly" (click)="toggleForm()">
         Cancelar
       </button>
     </div>

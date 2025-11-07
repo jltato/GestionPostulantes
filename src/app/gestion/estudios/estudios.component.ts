@@ -13,6 +13,7 @@ export class EstudiosComponent {
   @Input() estudios: Estudio[] = [];
   @Input() niveles: NivelEstudios[] = [];
   @Input() habilitado = false;
+  @Input() isReadOnly = false;
   @Input() postulanteId = 0;
 
   @Output() estudiosChange = new EventEmitter<Estudio[]>();

@@ -5,6 +5,7 @@
     <button
       *ngIf="habilitado"
       class="btn btn-sm btn border-0 ms-auto"
+      [disabled]="isReadOnly"
       (click)="toggleForm()"
       type="button"
     >
@@ -43,8 +44,8 @@
         <td>{{ fam.exInterno ? "Sí" : "No" }}</td>
         <td>{{ fam.visita ? "Sí" : "No" }}</td>
         <td *ngIf="habilitado">
-          <button class="btn btn-sm btn-primary me-1" (click)="editar(fam.familiaresId)">Editar</button>
-          <button class="btn btn-sm btn-danger" (click)="eliminar(fam.familiaresId)">Eliminar</button>
+          <button class="btn btn-sm btn-primary me-1" [disabled]="isReadOnly" (click)="editar(fam.familiaresId)">Editar</button>
+          <button class="btn btn-sm btn-danger" [disabled]="isReadOnly" (click)="eliminar(fam.familiaresId)">Eliminar</button>
         </td>
       </tr>
     </tbody>
@@ -91,10 +92,10 @@
       <label for="activo" class="form-check-label">Activo</label>
     </div>
     <div class="col-md-2 d-flex gap-1">
-      <button type="submit" class="btn btn-sm btn-success w-100">
+      <button type="submit" class="btn btn-sm btn-success w-100" [disabled]="isReadOnly">
         {{ editIndex !== null ? 'Actualizar' : 'Agregar' }}
       </button>
-      <button  type="button" class="btn btn-sm btn-secondary w-100" (click)="cancelar()">
+      <button  type="button" class="btn btn-sm btn-secondary w-100" [disabled]="isReadOnly" (click)="cancelar()">
         Cancelar
       </button>
     </div>

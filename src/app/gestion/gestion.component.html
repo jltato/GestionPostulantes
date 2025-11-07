@@ -1,6 +1,6 @@
 <!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 
-<div>
+<div class="container">
   <!-- container para errres -->
   <ng-container *ngIf="error; else datos">
     <p class="error">{{ error }}</p>
@@ -40,7 +40,7 @@
       >
         <fieldset class="border p-1 rounded mb-3 row g-2 col-xl-12 mt-0">
           <legend class="float-none w-auto px-3">FOTO CARNET</legend>
-          <div class="text-center">
+          <div class="text-center" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="cursor: pointer;">
             <div class="d-flex justify-content-center">
               <mat-spinner *ngIf="!fotoLista" diameter="50"></mat-spinner>
             </div>
@@ -340,6 +340,7 @@
           <app-contactos
             [contactos]="postulante.contactos"
             [habilitado] = "habilitado"
+            [isReadOnly]="isReadOnly"
             [postulanteId]="postulante.postulanteId"
             (contactosChange)="actualizarContactos($event)"
             >
@@ -349,6 +350,7 @@
           <app-estudios
           [estudios]="postulante.estudios"
           [habilitado] = "habilitado"
+          [isReadOnly]="isReadOnly"
           [postulanteId]="postulante.postulanteId"
           [niveles]="formData.nivelEstudios"
           (estudiosChange)="actualizarEstudios($event)"
@@ -358,6 +360,7 @@
           <app-trabajos
           [trabajos]="postulante.trabajos"
           [habilitado]="habilitado"
+          [isReadOnly]="isReadOnly"
           [postulanteId]="postulante.postulanteId"
           (trabajosChange)="actualizarTrabajos($event)"
           >
@@ -368,6 +371,7 @@
           <app-familiar
           [familiares]="Familiares"
           [habilitado]="habilitado"
+          [isReadOnly]="isReadOnly"
           [postulanteId]="postulante.postulanteId"
           [parentescos]="formData.parentescos"
           (familiaresChange)="actualizarFamiliares($event)"
@@ -388,12 +392,14 @@
             </div>
           </fieldset>
           <div class="d-xl-flex gap-2 float-end">
-            <button *ngIf="habilitado" [disabled]="guardando" type="button" class="btn btn-danger " (click)="deshabilitar()">Cancelar</button>
-            <button *ngIf="habilitado" [disabled]="guardando" type="button" class="btn btn-success " (click)="guardar()">
+            <button *ngIf="habilitado" [disabled]="guardando || isReadOnly" type="button" class="btn btn-danger " (click)="deshabilitar()">Cancelar</button>
+            <button *ngIf="habilitado" [disabled]="guardando || isReadOnly" type="button" class="btn btn-success " (click)="guardar()">
               <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
             </button>
-            <button *ngIf="!habilitado" [disabled]="guardando"  type="button" class="btn btn-secondary" (click)="habilitar()">Modificar</button>
+            <button *ngIf="!habilitado" [disabled]="guardando || isReadOnly || isReconocimientosMedicos"  type="button" class="btn btn-secondary" (click)="habilitar()">
+              {{ isReadOnly || isReconocimientosMedicos ? 'Solo Lectura' : 'Modificar' }}
+            </button>
           </div>
         }
         </form>
@@ -401,7 +407,37 @@
     </div>
     <hr class="" />
     <div *ngIf="postulante" class="row d-xl-flex">
-      <app-seguimiento [seguimiento]="postulante.seguimiento" [formData]="formData"></app-seguimiento>
+      <app-seguimiento 
+        [seguimiento]="postulante.seguimiento" 
+        [formData]="formData" 
+        [isReadOnly]="isReadOnly"
+        [isReconocimientosMedicos]="isReconocimientosMedicos">
+      </app-seguimiento>
     </div>
+
+
+    <!-- Modal Foto -->
+<div class="modal fade modal-xl modal-fullscreen-md-down modal-dialog-scrollable" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Foto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="d-flex justify-content-center" >
+         <img
+            *ngIf="fotoLista"
+            [src]="imagenUrl"
+            alt="Foto del postulante"
+            class="img-fluid"
+            style="max-height: 80vh; object-fit: contain;"
+          />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
   </ng-template>
 </div>

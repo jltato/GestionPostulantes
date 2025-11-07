@@ -25,6 +25,7 @@ import { EstudiosComponent } from "./estudios/estudios.component";
 import { TrabajosComponent } from "./trabajos/trabajos.component";
 import { FamiliarComponent } from "./familia/familia.component";
 import { AlertService } from '../Services/alert.service';
+import { AuthServiceService } from '../Services/auth-service.service';
 
 @Component({
   selector: 'app-gestion',
@@ -56,6 +57,7 @@ export class GestionComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   private postulanteService = inject(PostulanteService);
   private alert = inject(AlertService);
+  private authService = inject(AuthServiceService);
 
   postulante: any;
   imagenUrl: any;
@@ -78,6 +80,8 @@ export class GestionComponent implements OnInit {
   guardando = false;
   postulanteId=0;
   cargando = false;
+  isReadOnly = false;
+  isReconocimientosMedicos = false;
 
 
   //////////////////////////////////////// FORMULARIOS //////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +123,21 @@ export class GestionComponent implements OnInit {
 
 
   ngOnInit(): void {
+    // Verificar roles del usuario
+    this.authService.isReadOnly$().subscribe(isReadOnly => {
+      this.isReadOnly = isReadOnly;
+      if (isReadOnly) {
+        this.InicialFormGroup.disable();
+      }
+    });
+
+    this.authService.isReconocimientosMedicos$().subscribe(isReconocimientosMedicos => {
+      this.isReconocimientosMedicos = isReconocimientosMedicos;
+      if (isReconocimientosMedicos) {
+        this.InicialFormGroup.disable();
+      }
+    });
+
     this.postulanteService.getFormData().subscribe((data: any) => {
       this.formData = data;
 
@@ -147,7 +166,10 @@ export class GestionComponent implements OnInit {
     this.famVisitante = false;
     this.postulanteService.getPostulante(id.toString()).subscribe({
       next: (postulante) => {
-        this.InicialFormGroup.disable();
+        // Solo deshabilitar si no es readOnly o reconocimientosMedicos (ya están deshabilitados desde ngOnInit)
+        if (!this.isReadOnly && !this.isReconocimientosMedicos) {
+          this.InicialFormGroup.disable();
+        }
         this.postulante = postulante;
         this.postulanteId = postulante.postulanteId;
         this.cargarDatos(postulante);

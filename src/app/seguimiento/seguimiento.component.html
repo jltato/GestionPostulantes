@@ -43,6 +43,7 @@
                           type="button"
                           class="btn btn-sm align-middle p-0"
                           *ngIf="estado.estadoSeguimientoId !== etapaActualId"
+                          [disabled]="isReadOnly || isReconocimientosMedicos"
                           (click)="eliminarEstado(estado.estadoSeguimientoId)"
                         >
                           <mat-icon
@@ -160,8 +161,6 @@
             <div class="col-12 col-xl-5 ">
               <div class="d-xl-flex justify-content-around gap-2">
 
-
-
                 <div class="col">
                   <label for="etapa" class="form-label">Postulante a:</label>
                   <select
@@ -246,7 +245,7 @@
            <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="seguimientoFormGroup.invalid || guardando"
+              [disabled]="seguimientoFormGroup.invalid || guardando || (isReadOnly && !isReconocimientosMedicos)"
             >
               <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
@@ -255,7 +254,7 @@
               type="button"
               class="btn btn-danger"
               (click)="BorrarPostulante(seguimiento.postulanteId)"
-              [disabled]="seguimientoFormGroup.invalid && eliminando && guardando"
+              [disabled]="seguimientoFormGroup.invalid && eliminando && guardando || isReadOnly || isReconocimientosMedicos"
             >
             <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               {{ eliminando ? 'Eliminando...' : 'Eliminar Posutalnte' }}
