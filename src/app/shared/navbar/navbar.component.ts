@@ -13,6 +13,7 @@ import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +25,7 @@ import { CommonModule } from '@angular/common';
 export class NavbarComponent implements OnInit {
   isAuthenticated$!: Observable<boolean>;
   userName = 'USUARIO';
+  identityUrl = '';
 
   constructor(
     private router: Router,
@@ -70,14 +72,24 @@ export class NavbarComponent implements OnInit {
         if (userData) {
           const fullName = `${userData.given_name || ''} ${userData.family_name || ''}`.trim();
           this.userName = fullName ? fullName.toUpperCase() : 'USUARIO';
+          // Construir URL hacia el servidor de identidad si existe el id (sub)
+          if (userData.sub) {
+            const base = (environment.authUrl || '').replace(/\/+$/, '');
+            this.identityUrl = `${base}/Identity/Account/Manage/details?id=${userData.sub}`;
+          } else {
+            this.identityUrl = '';
+          }
         } else {
           this.userName = 'USUARIO';
+          this.identityUrl = '';
         }
       } catch {
         this.userName = 'USUARIO';
+        this.identityUrl = '';
       }
     } else {
       this.userName = 'USUARIO';
+      this.identityUrl = '';
     }
   }
   

@@ -40,7 +40,10 @@
   <span class="spacer"></span>
     
   @if (isAuthenticated$ | async) {
-    <span class="text-light ms-3 fs-6">Hola {{ userName }}!</span>
+    <span class="text-light ms-3 fs-6">Hola 
+      <a *ngIf="identityUrl" class="text-light text-decoration-underline" [href]="identityUrl" target="_blank" rel="noopener noreferrer">{{ userName }}</a>
+      <span *ngIf="!identityUrl">{{ userName }}</span>!
+    </span>
     <button mat-button class="text-light" (click)="logout()">
       <mat-icon>logout</mat-icon>
       Cerrar Sesión
@@ -62,10 +65,8 @@
       </button>
    }
   </mat-menu>
-
   
   <span><mat-icon (click)="abrirConfiguracion()" matTooltip="Configuraciones">settings</mat-icon></span>
-
 
 </mat-toolbar>
 
