@@ -1,0 +1,24 @@
+<div class="unauthorized-container">
+  <div class="unauthorized-card">
+    <div class="icon-container">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="warning-icon">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    
+    <h1>Acceso No Autorizado</h1>
+    
+    <div class="message">
+      <p>Hola <strong>Usuario</strong>,</p>
+      <p>Has iniciado sesión correctamente, pero no tienes autorización para acceder a esta aplicación.</p>
+    </div>
+    
+    <p class="info">Por favor, contacta al administrador del sistema si crees que esto es un error.</p>
+    
+    <button class="logout-button" (click)="logout()">
+      Cerrar Sesión
+    </button>
+  </div>
+</div>

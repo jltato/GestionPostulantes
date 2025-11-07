@@ -1,0 +1,86 @@
+.unauthorized-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.unauthorized-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.icon-container {
+  margin-bottom: 20px;
+}
+
+.warning-icon {
+  color: #f59e0b;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+h1 {
+  color: #1f2937;
+  font-size: 28px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.message {
+  color: #4b5563;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.message p {
+  margin: 10px 0;
+}
+
+.message strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.info {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.logout-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
