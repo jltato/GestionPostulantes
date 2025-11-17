@@ -14,6 +14,7 @@ import 'datatables.net-buttons-dt';
 import 'datatables.net-responsive-dt';
 import { PostulanteService } from '../Services/postulante.service';
 import { ESTADOS_POSTULANTE } from '../shared/enums/estados-postulantes';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-list',
@@ -29,6 +30,7 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private oidcSecurityService = inject(OidcSecurityService);
   tipo!: string;
   estadoId!: number;
   private tipoPostulanteId = 1;
@@ -79,6 +81,14 @@ export class ListComponent implements OnInit, AfterViewInit {
         type: 'POST',
         headers: {
           'x-api-key': this.apiKey,
+        },
+        beforeSend: (xhr: any) => {
+          // Obtener el token del OIDC y agregarlo como Bearer
+          this.oidcSecurityService.getAccessToken().subscribe(token => {
+            if (token) {
+              xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            }
+          });
         },
         data: (dataTablesParameters: any) => {
           // Agregar parámetros personalizados

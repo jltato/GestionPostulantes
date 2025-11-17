@@ -9,9 +9,10 @@ import { environment } from '../environments/environment';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideHttpClient(),
-    provideHttpClient(withInterceptors([authInterceptor()])),
+  provideRouter(routes),
+  // provideHttpClient once with the auth interceptor so access tokens are
+  // attached automatically to requests matching `secureRoutes` below.
+  provideHttpClient(withInterceptors([authInterceptor()])),
     importProvidersFrom(
       FormsModule,
       ReactiveFormsModule,
@@ -28,8 +29,11 @@ export const appConfig: ApplicationConfig = {
           silentRenew: true,
           autoCleanStateAfterAuthentication: true,
           logLevel: LogLevel.Debug,
-          secureRoutes: [],
-          maxIdTokenIatOffsetAllowedInSeconds: 300
+          // Añadir la URL base de la API aquí para que el authInterceptor
+          // incluya automáticamente el header Authorization: Bearer <token>
+          // en las peticiones hacia ese origen.
+          secureRoutes: [environment.apiUrl],
+          maxIdTokenIatOffsetAllowedInSeconds: 600
         },
       })
     ),
