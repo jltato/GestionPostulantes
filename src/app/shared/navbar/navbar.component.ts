@@ -54,7 +54,7 @@ export class NavbarComponent implements OnInit {
     this.isAuthenticated$.subscribe((isAuth) => {
       if (isAuth) {
         // Pequeno delay para asegurar que userData este en sessionStorage
-        setTimeout(() => this.loadUserName(), 100);
+        setTimeout(() => this.loadUserName(), 300);
       } else {
         this.userName = 'USUARIO';
       }
@@ -93,10 +93,6 @@ export class NavbarComponent implements OnInit {
     }
   }
   
-  
-
-
-
   cambiarEstado(estadoId: number) {
     this.router.navigate([], {
       relativeTo: this.route,

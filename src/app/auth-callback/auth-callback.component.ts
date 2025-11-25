@@ -3,6 +3,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { SseService } from '../Services/SseService.service';
 
 @Component({
   selector: 'app-auth-callback',
@@ -13,14 +14,16 @@ import { OidcSecurityService } from 'angular-auth-oidc-client';
 })
 export class AuthCallbackComponent implements OnInit {
 
-  constructor(private router: Router, private oidcSecurityService: OidcSecurityService) {}
+  constructor(private router: Router, private oidcSecurityService: OidcSecurityService, private sse: SseService) {}
 
   ngOnInit(): void {
     this.oidcSecurityService.checkAuth().subscribe({
       next: (result) => {
         if (result.isAuthenticated) {
           console.log('Usuario autenticado:', result.userData);
-          
+          const userId = result.userData?.sub;
+          this.sse.start(userId);
+
           // Verificar si el usuario está autorizado para esta aplicación
           const appAuthorized = result.userData?.app_authorized;
           

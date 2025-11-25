@@ -2,6 +2,7 @@
 import { inject, Injectable } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { Observable, of } from 'rxjs';
+import { SseService } from './SseService.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,13 @@ export class AuthServiceService {
   private oidcSecurityService = inject(OidcSecurityService);
   private readonly STORAGE_KEY = '0-Postulantes';
 
+  constructor(private sse: SseService) {}
   login() {
     this.oidcSecurityService.authorize();
   }
   
   logout() {
+    this.sse.stop();
     this.oidcSecurityService.logoff().subscribe((result) => {
       console.log('Logout result:', result);
     });
