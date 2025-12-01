@@ -1,25 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { LogoutHubService } from './logout-hub.service';
 import { inject, Injectable } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { Observable, of } from 'rxjs';
-import { SseService } from './SseService.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthServiceService {
   private oidcSecurityService = inject(OidcSecurityService);
+  private logoutHubService = inject(LogoutHubService);
   private readonly STORAGE_KEY = '0-Postulantes';
 
-  constructor(private sse: SseService) {}
-  login() {
-    this.oidcSecurityService.authorize();
+   constructor() {
+    this.oidcSecurityService.userData$.subscribe(user => {
+      const userId = user?.userData?.sub;
+
+      if (userId) {
+        // iniciar conexión SignalR
+        this.logoutHubService.startConnection(userId);
+
+        // escuchar el logout remoto
+        this.logoutHubService.logout$.subscribe(() => {
+          console.log("Logout remoto → ejecutando logout local");
+          this.logout();
+        });
+      }
+    });
   }
+
+  login() {
+  return this.oidcSecurityService.authorizeWithPopUp().subscribe({
+    next: (result) => {
+      console.log("Login OK:", result);
+    },
+    error: (err) => {
+      console.error("Error en login:", err);
+      alert("Error en login: por favor, intente nuevamente, o comuníquese con un administrador.");
+    }
+  });
+}
   
   logout() {
-    this.sse.stop();
-    this.oidcSecurityService.logoff().subscribe((result) => {
-      console.log('Logout result:', result);
+    this.logoutHubService.stopConnection();
+    this.oidcSecurityService.logoffAndRevokeTokens().subscribe({
+      next: () => console.log("Logout remoto OK"),
+      error: (err) => console.error("ERROR logout remoto:", err)
     });
   }
 
@@ -119,5 +145,17 @@ export class AuthServiceService {
    */
   getRoles(): string[] {
     return this.getRolesFromStorage();
+  }
+
+    /**
+   * Devuelve el userId (claim 'sub' o 'nameidentifier')
+   */
+  getUserId(): string | null {
+    const userData = this.getUserDataFromStorage();
+    if (!userData) return null;
+
+    // identityserver suele guardar el subject en 'sub'
+    // angular-auth-oidc-client a veces lo guarda como nameidentifier
+    return userData.sub || userData.nameidentifier || null;
   }
 }
