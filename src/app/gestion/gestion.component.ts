@@ -80,6 +80,7 @@ export class GestionComponent implements OnInit {
   guardando = false;
   postulanteId=0;
   cargando = false;
+  verificando = false;
   isReadOnly = false;
   isReconocimientosMedicos = false;
 
@@ -159,6 +160,7 @@ export class GestionComponent implements OnInit {
 
   cargarPostulante(id: number): void {
     this.cargando = true
+    this.verificando = true;
     this.fotoLista = false;
     this.antecedentes = false;
     this.visitante = false;
@@ -179,7 +181,7 @@ export class GestionComponent implements OnInit {
         this.getIMC(altura, peso)
         this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
           next: (verificado)=>{
-            this.cargando = false;
+            this.verificando = false;
             this.antecedentes = verificado[0].exInterno;
             this.visitante = verificado[0].visitante;
           }

@@ -84,14 +84,19 @@
           <fieldset class="border p-1 rounded mb-3 row g-2 mt-0">
             <legend class="float-none w-auto px-3 d-flex">DATOS PERSONALES </legend>
             <!-- Alertas -->
-             
+              @if(verificando){
+                <div class="d-flex ">
+                  <mat-spinner diameter="25"></mat-spinner>
+                </div>
+              }
+              @if(!verificando){
                 <div class="text-danger">
                   <p *ngIf="antecedentes"> *El DNI del postulante se encuentra en la base de datos de internos.</p>
                   <p *ngIf="visitante"> *El DNI del postulante se encuentra en la base de datos de visitantes.</p>
                   <p *ngIf="famAntecedente"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de internos.</p>
                   <p *ngIf="famVisitante"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de visitantes.</p>
                 </div>
-             
+              }
             
               <!-- Apellido -->
             <div class="col-12 col-md-4 col-xl-2 form-floating">

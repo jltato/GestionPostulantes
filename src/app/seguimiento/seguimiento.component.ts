@@ -230,6 +230,12 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   );
 }
 
+get etapasFiltradas() {
+  return this.formData.etapaSeguimiento.filter(
+    (e: { tipoInscripcionId: number; }) => e.tipoInscripcionId === this.tipo
+  );
+}
+
 toggleAsistencia(valor: boolean): void {
   const control = this.seguimientoFormGroup.get('asistencia');
   if (!control) return;

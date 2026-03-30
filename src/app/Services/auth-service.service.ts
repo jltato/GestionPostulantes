@@ -30,15 +30,7 @@ export class AuthServiceService {
   }
 
   login() {
-  return this.oidcSecurityService.authorizeWithPopUp().subscribe({
-    next: (result) => {
-      console.log("Login OK:", result);
-    },
-    error: (err) => {
-      console.error("Error en login:", err);
-      alert("Error en login: por favor, intente nuevamente, o comuníquese con un administrador.");
-    }
-  });
+  return this.oidcSecurityService.authorize();
 }
   
   logout() {
@@ -64,17 +56,17 @@ export class AuthServiceService {
       return null;
     }
   }
-
+ 
   /**
    * Obtiene los roles del usuario desde sessionStorage
    * @returns Array de roles o array vacío
    */
   private getRolesFromStorage(): string[] {
     const userData = this.getUserDataFromStorage();
-    if (!userData?.role) return [];
+    if (!userData?.app_permissions.appRole) return [];
     
     // El rol puede venir como string o array
-    return Array.isArray(userData.role) ? userData.role : [userData.role];
+    return Array.isArray(userData.app_permissions.appRole) ? userData.app_permissions.appRole : [userData.app_permissions.appRole];
   }
 
   /**

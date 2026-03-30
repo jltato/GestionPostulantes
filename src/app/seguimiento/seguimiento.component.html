@@ -69,13 +69,9 @@
                             formControlName="etapaSeguimientoId"
                             (change)="onEtapaChange()"
                           >
-                            >
-                            <option
-                              *ngFor="let etapa of formData.etapaSeguimiento"
-                              [value]="etapa.etapaSeguimientoId"
-                            >
+                           <option *ngFor="let etapa of etapasFiltradas" [value]="etapa.etapaSeguimientoId">
                               {{ etapa.nombreEtapa }}
-                            </option>
+                            </option>                                                      
                           </select>
                         </div>
                         <div class="text-center">
