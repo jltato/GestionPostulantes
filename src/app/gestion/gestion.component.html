@@ -373,16 +373,23 @@
           </app-trabajos>
 
 
-          <!-- Familiares -->
-          <app-familiar
-          [familiares]="Familiares"
-          [habilitado]="habilitado"
-          [isReadOnly]="isReadOnly"
-          [postulanteId]="postulante.postulanteId"
-          [parentescos]="formData.parentescos"
-          (familiaresChange)="actualizarFamiliares($event)"
-          ></app-familiar>
-
+          @if(verificando){
+              <div class="d-flex ">
+                <span class="mx-2">Verificando antecedentes...</span>
+                <mat-spinner diameter="25" ></mat-spinner>
+              </div>
+          }
+          @if(!verificando){
+            <!-- Familiares -->
+            <app-familiar
+            [familiares]="Familiares"
+            [habilitado]="habilitado"
+            [isReadOnly]="isReadOnly"
+            [postulanteId]="postulante.postulanteId"
+            [parentescos]="formData.parentescos"
+            (familiaresChange)="actualizarFamiliares($event)"
+            ></app-familiar>
+          }
           <!-- Observaciones -->
           <fieldset class="border p-1 rounded mb-3 row g-2">
             <legend class="float-none w-auto px-3">OBSERVACIONES</legend>

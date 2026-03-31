@@ -209,7 +209,6 @@ export class GestionComponent implements OnInit {
               this.antecedentes = verificado[0].exInterno;
               this.visitante = verificado[0].visitante;
             }
-            this.verificando = false;
           },
           error: () => {
             this.verificando = false;
@@ -223,6 +222,10 @@ export class GestionComponent implements OnInit {
             this.Familiares = familiares;
             this.famVisitante = familiares.some((fam: any) => fam.visita);
             this.famAntecedente = familiares.some((fam: any) => fam.exInterno);
+            this.verificando = false;
+          },
+          error: () => {            
+            this.verificando = false;
           }
         });
         this.loadSubscription?.add(famSub);
