@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { PostulanteService } from '../Services/postulante.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 import {
   FormBuilder,
   Validators,
@@ -83,6 +84,7 @@ export class GestionComponent implements OnInit {
   verificando = false;
   isReadOnly = false;
   isReconocimientosMedicos = false;
+  private loadSubscription?: Subscription;
 
 
   //////////////////////////////////////// FORMULARIOS //////////////////////////////////////////////////////////////////////////////////////
@@ -159,75 +161,100 @@ export class GestionComponent implements OnInit {
   }
 
   cargarPostulante(id: number): void {
-    this.cargando = true
+    // 1. Cancelamos TODO lo que esté en curso (la principal y las secundarias)
+    if (this.loadSubscription) {
+      this.loadSubscription.unsubscribe();
+    }
+    // Creamos un nuevo contenedor de suscripciones
+    this.loadSubscription = new Subscription();
+
+    // 2. Reseteamos el estado de la UI de inmediato
+    this.cargando = true;
     this.verificando = true;
     this.fotoLista = false;
     this.antecedentes = false;
     this.visitante = false;
-    this.famAntecedente = false
+    this.famAntecedente = false;
     this.famVisitante = false;
-    this.postulanteService.getPostulante(id.toString()).subscribe({
+    this.error = '';
+    this.imagenUrl = 'assets/images/sin foto.png';
+
+    // 3. Petición principal: Datos del postulante
+    const mainSub = this.postulanteService.getPostulante(id.toString()).subscribe({
       next: (postulante) => {
-        // Solo deshabilitar si no es readOnly o reconocimientosMedicos (ya están deshabilitados desde ngOnInit)
+        this.postulante = postulante;
+        this.postulanteId = postulante.postulanteId;
+        
+        // Cargamos los datos básicos en el formulario de inmediato
+        this.cargarDatos(postulante);
+        this.getEdad(postulante.fechaNac);
+        const altura = parseInt(postulante.datosPersonales.altura ?? "0");
+        const peso = parseInt(postulante.datosPersonales.peso ?? "0");
+        this.getIMC(altura, peso);
+
         if (!this.isReadOnly && !this.isReconocimientosMedicos) {
           this.InicialFormGroup.disable();
         }
-        this.postulante = postulante;
-        this.postulanteId = postulante.postulanteId;
-        this.cargarDatos(postulante);
-        this.getEdad(postulante.fechaNac);
-        const altura  = parseInt(postulante.datosPersonales.altura ?? "");
-        const peso = parseInt(postulante.datosPersonales.peso ?? "");
-        this.getIMC(altura, peso)
-        this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
-          next: (verificado)=>{
-            this.verificando = false;
-            this.antecedentes = verificado[0].exInterno;
-            this.visitante = verificado[0].visitante;
-          }
-        });
-        this.postulanteService.getFamiliares(postulante.postulanteId).subscribe({
-           next: (Familiares)=>{
-            this.cargando = false;
-            this.Familiares = Familiares;
-            this.famVisitante = false;
-            this.famAntecedente = false;
-            Familiares.forEach((fam: { visita: any; exInterno: any; }) => {
-              if(fam.visita){this.famVisitante=true}
-              if(fam.exInterno){this.famAntecedente = true}
-            });
-          }
-        });
 
+        // Ya tenemos los datos básicos, quitamos el spinner general
+        this.cargando = false;
+
+        // 4. Disparamos las llamadas "lentas" de forma independiente
+        // Cada una se añade al contenedor para poder cancelarlas si el usuario cambia de postulante
+        
+        // Llamada de Verificación (la más lenta)
+        const verifSub = this.postulanteService.getVerificacion(postulante.postulanteId).subscribe({
+          next: (verificado) => {
+            if (verificado && verificado.length > 0) {
+              this.antecedentes = verificado[0].exInterno;
+              this.visitante = verificado[0].visitante;
+            }
+            this.verificando = false;
+          },
+          error: () => {
+            this.verificando = false;
+          }
+        });
+        this.loadSubscription?.add(verifSub);
+
+        // Llamada de Familiares
+        const famSub = this.postulanteService.getFamiliares(postulante.postulanteId).subscribe({
+          next: (familiares) => {
+            this.Familiares = familiares;
+            this.famVisitante = familiares.some((fam: any) => fam.visita);
+            this.famAntecedente = familiares.some((fam: any) => fam.exInterno);
+          }
+        });
+        this.loadSubscription?.add(famSub);
+
+        // Llamada de Imagen
         const documentos = postulante.documentos;
         if (documentos && documentos.length > 0) {
-
-          const idFoto = documentos[0].documentoId;
-
-          this.postulanteService.getImage(idFoto).subscribe({
+          const imgSub = this.postulanteService.getImage(documentos[0].documentoId).subscribe({
             next: (imagenBlob) => {
-              //this.imagenUrl = imagenBlob;
               this.imagenUrl = URL.createObjectURL(imagenBlob);
               this.fotoLista = true;
             },
-            error: (err) => {
-              console.error('Error cargando imagen:', err.message);
+            error: () => {
               this.imagenUrl = 'assets/images/sin foto.png';
               this.fotoLista = true;
-            },
+            }
           });
+          this.loadSubscription?.add(imgSub);
+        } else {
+          this.fotoLista = true;
         }
-        else{
-           console.error('Error cargando imagen: la imagen no existe');
-              this.imagenUrl = 'assets/images/sin foto.png';
-              this.fotoLista = true;
-        }
-
       },
       error: (err) => {
         this.error = err.message;
-      },
+        this.cargando = false;
+        this.verificando = false;
+        this.fotoLista = true;
+      }
     });
+
+    // Añadimos la suscripción principal al contenedor
+    this.loadSubscription.add(mainSub);
   }
 
   navegarSiguiente(): void {

@@ -9,10 +9,10 @@ import { environment } from '../environments/environment';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-  provideRouter(routes),
-  // provideHttpClient once with the auth interceptor so access tokens are
-  // attached automatically to requests matching `secureRoutes` below.
-  provideHttpClient(withInterceptors([authInterceptor()])),
+    provideRouter(routes),
+    // provideHttpClient once with the auth interceptor so access tokens are
+    // attached automatically to requests matching `secureRoutes` below.
+    provideHttpClient(withInterceptors([authInterceptor()])),
     importProvidersFrom(
       FormsModule,
       ReactiveFormsModule,
