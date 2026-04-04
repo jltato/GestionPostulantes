@@ -101,4 +101,8 @@ export class PostulanteService {
     return this.http.put(`${this.baseUrl}/Postulantes/${postulanteId}`, postulante, {headers:this.getHeaders(false)})
   }
 
+  getPostulacionesAnteriores(postulanteId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Postulantes/PostulacionesAnteriores/${postulanteId}`, {headers:this.getHeaders(false)})
+  }
+
 }

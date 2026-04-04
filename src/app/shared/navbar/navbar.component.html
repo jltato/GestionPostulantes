@@ -12,7 +12,7 @@
       class="text-light"
       mat-button
       [routerLink]="['/listado/Cadetes']"
-      [queryParams]="{ est: 0 }"
+      [queryParams]="{ est: 1 }"
       routerLinkActive="active"
     >
       Cadetes
@@ -21,7 +21,7 @@
       class="text-light"
       mat-button
       [routerLink]="['/listado/Suboficiales']"
-      [queryParams]="{ est: 0 }"
+      [queryParams]="{ est: 1 }"
       routerLinkActive="active"
     >
       Suboficiales
@@ -30,7 +30,7 @@
       class="text-light"
       mat-button
       [routerLink]="['/listado/Profesionales']"
-      [queryParams]="{ est: 0 }"
+      [queryParams]="{ est: 1 }"
       routerLinkActive="active"
     >
       Profesionales
@@ -55,7 +55,7 @@
     </button>
   }
 
-  <button mat-button class="text-light" [matMenuTriggerFor]="menu">Menu</button>
+  <!-- <button mat-button class="text-light" [matMenuTriggerFor]="menu">Menu</button>
   <mat-menu #menu="matMenu">
     @for (estado of estados; track $index) {
       <button
@@ -64,7 +64,7 @@
           {{ estado.label }}
       </button>
    }
-  </mat-menu>
+  </mat-menu> -->
   
   <span><mat-icon (click)="abrirConfiguracion()" matTooltip="Configuraciones">settings</mat-icon></span>
 

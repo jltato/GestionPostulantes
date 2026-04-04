@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
+//import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { ConfigurationPopupComponent } from '../configuration-popup/configuration-popup.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule} from '@angular/material/tooltip';
-import { ESTADOS_POSTULANTE } from '../enums/estados-postulantes';
+//import { ESTADOS_POSTULANTE } from '../enums/estados-postulantes';
 import { AuthServiceService } from '../../Services/auth-service.service';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { Observable } from 'rxjs';
@@ -18,7 +18,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [MatToolbarModule, MatButtonModule, RouterModule, MatMenuModule, MatIconModule, MatDialogModule, MatTooltipModule, CommonModule],
+  imports: [MatToolbarModule, MatButtonModule, RouterModule, MatIconModule, MatDialogModule, MatTooltipModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
@@ -35,7 +35,7 @@ export class NavbarComponent implements OnInit {
     private oidcSecurityService: OidcSecurityService
   ) {}
 
-  estados = ESTADOS_POSTULANTE;
+ // estados = ESTADOS_POSTULANTE;
 
   ngOnInit(): void {
     // Verificar autenticación en TODAS las rutas excepto los callbacks
@@ -93,13 +93,13 @@ export class NavbarComponent implements OnInit {
     }
   }
   
-  cambiarEstado(estadoId: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { est: estadoId },
-      queryParamsHandling: 'merge',
-    });
-  }
+  // cambiarEstado(estadoId: number) {
+  //   this.router.navigate([], {
+  //     relativeTo: this.route,
+  //     queryParams: { est: estadoId },
+  //     queryParamsHandling: 'merge',
+  //   });
+  // }
 
 
   abrirConfiguracion() {

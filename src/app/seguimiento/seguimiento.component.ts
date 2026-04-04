@@ -4,14 +4,15 @@ import { FormBuilder,  ReactiveFormsModule,  Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostulanteService } from '../Services/postulante.service';
 import { MatIcon } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '../Services/alert.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-seguimiento',
   standalone : true,
-  imports: [CommonModule, MatIcon, ReactiveFormsModule, MatButtonToggleModule],
+  imports: [CommonModule, MatIcon, ReactiveFormsModule, MatButtonToggleModule, MatProgressSpinnerModule],
   templateUrl: './seguimiento.component.html',
   styleUrl: './seguimiento.component.css'
 })
@@ -21,6 +22,8 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   @Input() formData: any;
   @Input() isReadOnly = false;
   @Input() isReconocimientosMedicos = false;
+  @Input() postulanteIds: number[] = [];
+  @Input() currentIndex = 0;
 
     // en la clase del componente
 
@@ -28,12 +31,15 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   private _formBuilder = inject(FormBuilder);
   private postulanteService = inject(PostulanteService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   guardando = false;
   eliminando = false;
   seguimientoId = 0;
   etapaActualId = 0;
   error = '';
   tipo=0;
+  postulacionesAnteriores:any[] = [];
+  cargandoAnteriores = false;
 
 
   seguimientoFormGroup = this._formBuilder.group({
@@ -56,11 +62,23 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     this.seguimientoFormGroup.get('tipoInscripcionId')?.valueChanges.subscribe(valor => {
       this.tipo = +(valor ?? 0);
     });
+    this.cargarPostulacionesAnteriores(this.seguimiento.postulanteId);
+  }
+
+  cargarPostulacionesAnteriores(postulanteId: any) {
+    this.cargandoAnteriores = true;
+    this.postulanteService.getPostulacionesAnteriores(postulanteId).subscribe({
+      next: (postulaciones: any[]) => {
+        this.postulacionesAnteriores = postulaciones;
+        this.cargandoAnteriores = false;
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['seguimiento'] && changes['seguimiento'].currentValue) {
       this.setearFormulario();
+      this.cargarPostulacionesAnteriores(this.seguimiento.postulanteId);
     }
     
     // Manejar permisos según el rol
@@ -130,8 +148,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     this.postulanteService.postSeguimiento(seguimientoPayload).subscribe({
       next: (seguimiento: any) => {
         this.etapaActualId = seguimiento.estadoSeguimientoActualId;
-        this.seguimiento.estadosSeguimiento =
-          seguimiento.estadosSeguimiento;
+        this.seguimiento.estadosSeguimiento = seguimiento.estadosSeguimiento;
         this.seguimientoId = seguimiento.seguimientoId;
         this.tipo=seguimiento.tipoInscripcionId;
         const fechaHoreaFormat = seguimiento.estadoSeguimientoActual.fechaTurno.substring(0, 16);
@@ -215,7 +232,7 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     next: () => {
       this.eliminando = false;
       this.alert.alert("Eliminado","¡El postulante ha sido eliminado con éxito!");
-      this.router.navigate(['/home']);
+      this.navegarSiguiente();
     },
     error: (err) => {
       this.eliminando = false;
@@ -249,6 +266,19 @@ toggleAsistencia(valor: boolean): void {
   }
 }
 
+  navegarSiguiente(): void {
+    if (this.currentIndex < this.postulanteIds.length - 1) {
+      const siguienteId = this.postulanteIds[this.currentIndex + 1];
+      this.router.navigate(['../', siguienteId], { relativeTo: this.route });
+    }
+  }
+
+  navegar(id: number): void {
+  this.router.navigate(['../', id], { 
+    relativeTo: this.route,
+    queryParams: { track: this.currentIndex } 
+  });
+}
 
 
 }

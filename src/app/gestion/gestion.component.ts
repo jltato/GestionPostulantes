@@ -74,6 +74,7 @@ export class GestionComponent implements OnInit {
   Familiares:any;
   antecedentes = false;
   visitante = false;
+  empleado = false;
   famAntecedente = false
   famVisitante = false;
   error = '';
@@ -146,13 +147,20 @@ export class GestionComponent implements OnInit {
 
       this.route.paramMap.subscribe((params) => {
         const id = Number(params.get('id'));
+        const track = Number(this.route.snapshot.queryParamMap.get('track'));
+        
         if (id && id !== this.idActual) {
           this.idActual = id;
-          this.cargarPostulante(id);
           this.postulanteIds = JSON.parse(
-            sessionStorage.getItem('postulanteIds') || '[]',
-          );
-          this.currentIndex = this.postulanteIds.indexOf(id);
+              sessionStorage.getItem('postulanteIds') || '[]',
+            );
+          this.cargarPostulante(id);
+          if (track !== 0) { // Si viene el parámetro de track, lo usamos para setear el índice actual
+            this.currentIndex = track;
+          } else { // Si no, lo calculamos normalmente
+            
+            this.currentIndex = this.postulanteIds.indexOf(id);
+          }
         }
       });
     });
@@ -208,6 +216,7 @@ export class GestionComponent implements OnInit {
             if (verificado && verificado.length > 0) {
               this.antecedentes = verificado[0].exInterno;
               this.visitante = verificado[0].visitante;
+              this.empleado = verificado[0].empleado;
             }
           },
           error: () => {

@@ -96,6 +96,7 @@
                   <p *ngIf="visitante"> *El DNI del postulante se encuentra en la base de datos de visitantes.</p>
                   <p *ngIf="famAntecedente"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de internos.</p>
                   <p *ngIf="famVisitante"> *El DNI de alguno de los familiares del postulante se encuentra en la base de datos de visitantes.</p>
+                  <p *ngIf="empleado" class="text-primary"> *El DNI del postulante se encuentra en la base de datos de empleados.</p>
                 </div>
               }
             
@@ -144,7 +145,7 @@
             </div>
 
             <!-- Fecha de nacimiento -->
-            <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <div class="col-12 col-md-3 col-xl-3 form-floating">
               <label class="form-label small">Fecha de Nacimiento</label>
               <input
                 type="date"
@@ -234,7 +235,7 @@
             </div>
 
             <!-- Estado Civil -->
-            <div class="col-12 col-md-3 col-xl-2 form-floating">
+            <div class="col-12 col-md-4 col-xl-3 form-floating">
               <label class="form-label small">Estado Civil</label>
               <select
                 class="form-select form-select-sm"
@@ -423,8 +424,11 @@
       <app-seguimiento 
         [seguimiento]="postulante.seguimiento" 
         [formData]="formData" 
+        [postulanteIds]="postulanteIds"
+        [currentIndex]="currentIndex"
         [isReadOnly]="isReadOnly"
-        [isReconocimientosMedicos]="isReconocimientosMedicos">
+        [isReconocimientosMedicos]="isReconocimientosMedicos"
+        >
       </app-seguimiento>
     </div>
 

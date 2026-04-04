@@ -148,79 +148,122 @@
                     </div>
               </div>
               </fieldset>
-                          </div>
+            </div>
 
             <!-- div para barra divisora vertical -->
             <div class="border-end d-none d-xl-block"></div>
 
             <!--div para el estado general del postulante-->
             <div class="col-12 col-xl-5 ">
-              <div class="d-xl-flex justify-content-around gap-2">
+              <div class="d-xl-flex gap-2">
+                <div class="col-xl-7">
+                  <div class="d-xl-flex justify-content-around gap-2">
 
-                <div class="col">
-                  <label for="etapa" class="form-label">Postulante a:</label>
-                  <select
-                    id="etapa"
-                    class="form-select"
-                    formControlName="tipoInscripcionId"
-                  >
-                    <option
-                      *ngFor="let tipo of formData.tiposInscripcion"
-                      [value]="tipo.tipoInscripcionId"
-                    >
-                      {{ tipo.tipoInscripcionNombre }}
-                    </option>
-                  </select>
+                    <div class="col">
+                      <label for="etapa" class="form-label nowrap">Postulante a:</label>
+                      <select
+                        id="etapa"
+                        class="form-select"
+                        formControlName="tipoInscripcionId"
+                      >
+                        <option
+                          *ngFor="let tipo of formData.tiposInscripcion"
+                          [value]="tipo.tipoInscripcionId"
+                        >
+                          {{ tipo.tipoInscripcionNombre }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col"  *ngIf="tipo === 3">
+                      <label for="etapa" class="form-label">Profesión:</label>
+                      <select
+                        id="etapa"
+                        class="form-select"
+                        formControlName="sectorSolicitudId"
+                      >
+                        <option
+                          *ngFor="let sector of formData.sectorSolicitud"
+                          [value]="sector.sectorSolicitudId"
+                        >
+                          {{ sector.nombreSector }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col">
+                      <label for="etapa" class="form-label nowrap">Estado Gral</label>
+                      <select
+                        id="etapa"
+                        class="form-select"
+                        formControlName="estadoId"
+                      >
+                        >
+                        <option
+                          *ngFor="let estado of formData.estados"
+                          [value]="estado.estadoId"
+                        >
+                          {{ estado.estadoNombre }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                      <label for="etapa" class="form-label">Campaña:</label>
+                      <select
+                        id="campania"
+                        class="form-select"
+                        formControlName="campaniaId"
+                      >
+                        <option
+                          *ngFor="let campania of campaniasFiltradas"
+                          [value]="campania.campaniaId"
+                        >
+                          {{ campania.nombre }}
+                        </option>
+                      </select>
+                  </div>
                 </div>
-
-                <div class="col"  *ngIf="tipo === 3">
-                  <label for="etapa" class="form-label">Sector Profesión:</label>
-                  <select
-                    id="etapa"
-                    class="form-select"
-                    formControlName="sectorSolicitudId"
-                  >
-                    <option
-                      *ngFor="let sector of formData.sectorSolicitud"
-                      [value]="sector.sectorSolicitudId"
-                    >
-                      {{ sector.nombreSector }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="col">
-                  <label for="etapa" class="form-label">Estado General</label>
-                  <select
-                    id="etapa"
-                    class="form-select"
-                    formControlName="estadoId"
-                  >
-                    >
-                    <option
-                      *ngFor="let estado of formData.estados"
-                      [value]="estado.estadoId"
-                    >
-                      {{ estado.estadoNombre }}
-                    </option>
-                  </select>
+                 <div class="border-end d-none d-xl-block"></div>
+                  <!-- div para Otras Postulaciones -->
+                <div class="col-sm-12 col-xl ">
+                  <div class="">
+                    <div class="col">
+                      <label for="postulaciones" class="form-label">Otras Postulaciones:</label>
+                     @if (cargandoAnteriores) {
+                        <div class="d-flex justify-content-center align-items-center mt-4">
+                          <mat-spinner diameter="25"></mat-spinner>
+                        </div>
+                      }
+                     @else{
+                        <select 
+                          id="postulaciones"
+                          class="form-select " 
+                          size="5"    
+                          style="font-size: small;"      
+                          (change)="navegar($any($event.target).value)"           
+                        >
+                          <option
+                            *ngFor="let postulacion of postulacionesAnteriores"
+                            [value]="postulacion.postulanteId"
+                            [ngStyle]="{
+                                'background-color': postulacion.estado === 'APTO' ? '#d1e7dd' : 
+                                                    postulacion.estado === 'NO APTO' ? '#f8d7da' : 
+                                                    postulacion.estado === 'EN PROCESO' ? '#fff3cd' : 'white',
+                                'color': postulacion.estado === 'APTO' ? '#0f5132' : 
+                                        postulacion.estado === 'NO APTO' ? '#842029' : 
+                                        postulacion.estado === 'EN PROCESO' ? '#664d03' : 'black'
+                              }"                            
+                            >
+                            {{ postulacion.fechaSoclicitud | date:'dd/MM/yy' }} - {{ postulacion.estado}}
+                          </option>
+                        </select>
+                      }
+                    </div>
+                  </div>               
                 </div>
               </div>
-              <div class="col-md">
-                  <label for="etapa" class="form-label">Campaña:</label>
-                  <select
-                    id="campania"
-                    class="form-select"
-                    formControlName="campaniaId"
-                  >
-                    <option
-                      *ngFor="let campania of campaniasFiltradas"
-                      [value]="campania.campaniaId"
-                    >
-                      {{ campania.nombre }}
-                    </option>
-                  </select>
-                </div>
+
               <hr>
               <div class="mb-3">
                 <label for="observaciones" class="form-label"
@@ -234,7 +277,11 @@
                   appUppercase
                 ></textarea>
               </div>
+          
             </div>
+          
+            
+          
           </div>
           <!-- <hr> -->
           <div class="d-flex gap-2 justify-content-around mb-2">
@@ -253,7 +300,7 @@
               [disabled]="seguimientoFormGroup.invalid && eliminando && guardando || isReadOnly || isReconocimientosMedicos"
             >
             <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              {{ eliminando ? 'Eliminando...' : 'Eliminar Posutalnte' }}
+              {{ eliminando ? 'Eliminando...' : 'Eliminar Postulante' }}
             </button>
           </div>
         </fieldset>

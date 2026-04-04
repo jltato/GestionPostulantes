@@ -1,7 +1,23 @@
-<div class="container-xl container-fluid">
+<div class="container-xxl container-fluid">
   <div class="text-center">
-    <p class="fs-1">Listado de Postulantes a {{ title }}</p>
-  </div>
+    <div class="d-flex justify-content-center align-items-baseline">
+
+    
+    <p class="fs-1">{{ title }} -</p>
+
+    <div class="d-flex justify-content-between align-items-center ms-2">
+      <!-- <mat-form-field  class="text-center"> -->
+        <!-- <mat-label>Estado</mat-label> -->
+        <mat-select [value]="estadoId" class="estado-select" (selectionChange)="cambiarEstado($event.value)">
+          @for (estado of estados; track estado.value) {
+            <mat-option [value]="estado.value">
+              {{ estado.label }}
+            </mat-option>
+          }
+        </mat-select>
+      <!-- </mat-form-field> -->
+    </div>
+    </div>
 
   <table
     id="laTabla"

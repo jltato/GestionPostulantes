@@ -15,11 +15,14 @@ import 'datatables.net-responsive-dt';
 import { PostulanteService } from '../Services/postulante.service';
 import { ESTADOS_POSTULANTE } from '../shared/enums/estados-postulantes';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatMenuModule, MatSelectModule, MatFormFieldModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css',
 })
@@ -42,12 +45,12 @@ export class ListComponent implements OnInit, AfterViewInit {
     'gRnMxbEdZjkVr9m9jc18o4DcLu9CbD202KmzVp0m0LN-YPlZXUvXKgmp2GrJd9o6F1NfUFUKIyyGzh9LJ56G1LFZsJClNkbJjf-iCHhvLj1kO8oDaLKaS2pvtu1IcgsgFgqDuT4B0TieOpn8GEJuiUIM-VXUMvCR0JdsH9vWDr2KjewWqfCsQbnudLP2sUwz0vAWpLNaDPpFbXeq3V-xO7W1qlO9ETHtnoBBUHyrQQPIIiE4Ywc4oDsFkANjSxT9';
   filteredIds: number[] = [];
 
-
   ngOnInit(): void {
     this.tipo = this.route.snapshot.paramMap.get('tipo')!;
     this.estadoId = Number(this.route.snapshot.queryParamMap.get('est') ?? '1');
     this.tipoPostulanteId = this.tipoANumero(this.tipo.toLowerCase());
-    this.cargaTitulo(this.tipo, this.estadoId);
+    this.title = this.tipo ;
+    //this.cargaTitulo(this.tipo, this.estadoId);
 
     this.storageKey = `DataTables_${this.router.url}`;
 
@@ -57,7 +60,7 @@ export class ListComponent implements OnInit, AfterViewInit {
     if (tabla.length > 0 && tabla.offset()) {
       tableOffsetTop = tabla.offset()!.top;
     }
-    const availableHeight = windowHeight - tableOffsetTop - 300;
+    const availableHeight = windowHeight - tableOffsetTop - 230;
 
     this.dtOptions = {
       serverSide: true,
@@ -194,12 +197,21 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   }
 
-  cargaTitulo(tipo:string, estado:number) : void
-    {
-      const estadoActual = ESTADOS_POSTULANTE.find(e => e.value === estado);
-      const label = estadoActual ? estadoActual.label : "Desconocido";
-      this.title = tipo + " (" + label + ")";
-    }
+  cambiarEstado(estadoId: number) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { est: estadoId },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+
+  // cargaTitulo(tipo:string, estado:number) : void
+  //   {
+  //     const estadoActual = ESTADOS_POSTULANTE.find(e => e.value === estado);
+  //     const label = estadoActual ? estadoActual.label : "Desconocido";
+  //     this.title = tipo + "(" + label + ")";
+  //   }
 
 
   private initTable(): void {
@@ -223,8 +235,9 @@ export class ListComponent implements OnInit, AfterViewInit {
           this.estadoId = nuevoEstadoId;
           this.tipoPostulanteId = this.tipoANumero(nuevoTipo.toLowerCase());
           this.storageKey = nuevoStorageKey;
+          this.title = this.tipo ;
 
-          this.cargaTitulo(this.tipo, this.estadoId);
+          //this.cargaTitulo(this.tipo, this.estadoId);
 
           if (tableExists && cambiarConfiguracion) {
             $('#laTabla').DataTable().clear().destroy(true);
