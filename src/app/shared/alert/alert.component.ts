@@ -39,20 +39,7 @@ export class AlertComponent {
     this.alertModalInstance?.hide();
   }
 
-  // showConfirm(title: string, message: string): Promise<boolean> {
-  //   this.title = title;
-  //   this.message = message;
-  //   this.confirmVisible = true;
-
-  //   return new Promise((resolve) => {
-  //     this.confirmResolver = resolve;
-  //   });
-  // }
-
-  // confirm(result: boolean) {
-  //   this.confirmVisible = false;
-  //   this.confirmResolver?.(result);
-  // }
+  
 
   showConfirm(title: string, message: string): Promise<boolean> {
   this.title = title;

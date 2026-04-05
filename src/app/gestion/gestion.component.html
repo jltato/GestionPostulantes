@@ -428,6 +428,8 @@
         [currentIndex]="currentIndex"
         [isReadOnly]="isReadOnly"
         [isReconocimientosMedicos]="isReconocimientosMedicos"
+        [eliminando]="eliminando"
+        (emitBorrarPostulante)="BorrarPostulante($event)"
         >
       </app-seguimiento>
     </div>

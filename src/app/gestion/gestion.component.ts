@@ -80,6 +80,7 @@ export class GestionComponent implements OnInit {
   error = '';
   habilitado=false;
   guardando = false;
+  eliminando = false;
   postulanteId=0;
   cargando = false;
   verificando = false;
@@ -514,5 +515,61 @@ export class GestionComponent implements OnInit {
   }
   actualizarFamiliares(nuevosFamiliares: any[]) {
     this.Familiares = [...nuevosFamiliares];
+  }
+
+  async BorrarPostulante(postulanteId: number) {
+    this.eliminando = true;
+    const confirmado = await this.alert.confirm('Eliminar', '¿Estás seguro que querés eliminar esta postulación? <br> Esta acción no se puede deshacer.');
+    if (!confirmado) {
+      return;
+    }
+
+    this.eliminando = true;
+    this.postulanteService.eliminarPostulante(postulanteId).subscribe({
+      next: () => {
+        this.eliminando = false;
+        
+        const track = Number(this.route.snapshot.queryParamMap.get('track'));        
+        this.alert.alert("Eliminado", "¡El postulante ha sido eliminado con éxito!");
+
+        // CASO A: Borrando una postulación secundaria (tiene track)
+        if (track !== null && track !== 0) {
+          // Verificamos que el índice original siga siendo válido en el array
+          if (track >= 0 && track < this.postulanteIds.length) {
+            const targetId = this.postulanteIds[track];
+            // Volvemos al postulante original (el que está en la lista)
+            this.router.navigate(['../', targetId], { relativeTo: this.route });
+          } else {
+            // Si por alguna razón el índice se perdió, volvemos al home o listado
+            this.router.navigate(['/home']);
+          }
+        } else {
+          // CASO B: Borrando el postulante que SÍ está en la lista (no tiene track)   
+          // Eliminar del array local y actualizar sessionStorage
+          this.postulanteIds.splice(this.currentIndex, 1);
+          sessionStorage.setItem('postulanteIds', JSON.stringify(this.postulanteIds));
+          
+          if (this.postulanteIds.length === 0) {
+            this.router.navigate(['/home']);
+            return;
+          }
+          // navegamos al "siguiente" (que ahora ocupa el currentIndex)
+          else if (this.currentIndex < this.postulanteIds.length) {
+            const siguienteId = this.postulanteIds[this.currentIndex];
+            this.router.navigate(['../', siguienteId], { relativeTo: this.route });
+          } else  // o al anterior si borramos el último
+           {
+            this.currentIndex = this.postulanteIds.length - 1;
+            const anteriorId = this.postulanteIds[this.currentIndex];
+            this.router.navigate(['../', anteriorId], { relativeTo: this.route });
+          }
+        }
+      },
+      error: (err) => {
+        this.eliminando = false;
+        this.alert.alert("Error", "No se pudo eliminar el postulante");
+        console.error('Error al eliminar', err);
+      },
+    });
   }
 }

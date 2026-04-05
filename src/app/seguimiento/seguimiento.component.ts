@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder,  ReactiveFormsModule,  Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostulanteService } from '../Services/postulante.service';
@@ -23,7 +23,9 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   @Input() isReadOnly = false;
   @Input() isReconocimientosMedicos = false;
   @Input() postulanteIds: number[] = [];
+  @Input() eliminando = false;
   @Input() currentIndex = 0;
+  @Output() emitBorrarPostulante = new EventEmitter<number>();
 
     // en la clase del componente
 
@@ -33,7 +35,6 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   guardando = false;
-  eliminando = false;
   seguimientoId = 0;
   etapaActualId = 0;
   error = '';
@@ -221,24 +222,8 @@ export class SeguimientoComponent implements OnInit, OnChanges  {
     }
   }
 
-  async BorrarPostulante(postulanteId: number) {
-    const confirmado = await this.alert.confirm('Eliminar', '¿Estás seguro?');
-    if (!confirmado) {
-    return;
-  }
-
-  this.eliminando = true;
-  this.postulanteService.eliminarPostulante(postulanteId).subscribe({
-    next: () => {
-      this.eliminando = false;
-      this.alert.alert("Eliminado","¡El postulante ha sido eliminado con éxito!");
-      this.navegarSiguiente();
-    },
-    error: (err) => {
-      this.eliminando = false;
-      console.log(err);
-    },
-  });
+  BorrarPostulante(postulanteId: number) {
+    this.emitBorrarPostulante.emit(postulanteId);
   }
 
  get campaniasFiltradas() {
@@ -266,13 +251,7 @@ toggleAsistencia(valor: boolean): void {
   }
 }
 
-  navegarSiguiente(): void {
-    if (this.currentIndex < this.postulanteIds.length - 1) {
-      const siguienteId = this.postulanteIds[this.currentIndex + 1];
-      this.router.navigate(['../', siguienteId], { relativeTo: this.route });
-    }
-  }
-
+  
   navegar(id: number): void {
   this.router.navigate(['../', id], { 
     relativeTo: this.route,
